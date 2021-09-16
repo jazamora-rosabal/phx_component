@@ -17,6 +17,9 @@ defmodule Phoenix.Components do
       import Phoenix.Components
       import Phoenix.Components.Paginate
       import Phoenix.Components.Viewer
+      import Phoenix.Components.DatePicker
+      import Phoenix.Components.CalendarDay
+      import Phoenix.Components.CalendarMonthYear
     end
   end
 
@@ -29,10 +32,11 @@ defmodule Phoenix.Components do
   # Muestra barra progresso
   # default => assign(:progress, %{:total => 0, :loaded => 0})
   def progressbar(%{:total => 0, :loaded => 0}), do: "width: 0"
-  def progressbar(%{:total => total, :loaded => loaded}), do: "width: #{(loaded / total) * 100 |> trunc()}%"
+
+  def progressbar(%{:total => total, :loaded => loaded}),
+    do: "width: #{(loaded / total * 100) |> trunc()}%"
 
   # Extraer la fecha
   defp extractdate({:ok, date}), do: date
   defp extractdate(_), do: DateTime.utc_now()
-
 end

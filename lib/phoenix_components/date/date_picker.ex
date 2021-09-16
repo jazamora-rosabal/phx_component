@@ -7,8 +7,6 @@ defmodule Phoenix.Components.DatePicker do
   use Timex
   require Logger
 
-  alias Phoenix.Components.CalendarDay
-  alias Phoenix.Components.CalendarMonthYear
   alias Calendar.Helper
   alias Timex.Timezone
 
