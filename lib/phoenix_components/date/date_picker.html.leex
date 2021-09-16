@@ -122,7 +122,7 @@
                       <%= for week <- @week_rows_left do %>
                         <div class="flex w-full items-center">
                           <%= for day <- week do %>
-                              <%= live_component @socket, CalendarDay,
+                              <%= live_component @socket, Phoenix.Components.CalendarDay,
                               id: generate_id_calendar(@id, "left", day),
                               parent_id: @id,
                               day: day,
@@ -144,7 +144,7 @@
                       <%= for rows <- get_month_or_years(@calendar_left_mode, @left_month ) do %>
                         <div class="flex w-full items-center">
                           <%= for date <- rows do %>
-                              <%= live_component @socket, CalendarMonthYear,
+                              <%= live_component @socket, Phoenix.Components.CalendarMonthYear,
                                   id: "#{@id}_left_column-#{date}",
                                   parent_id: @id,
                                   date: date,
@@ -203,7 +203,7 @@
                       <%= for week <- @week_rows_right do %>
                         <div class="flex w-full items-center">
                           <%= for day <- week do %>
-                            <%= live_component @socket, CalendarDay,
+                            <%= live_component @socket, Phoenix.Components.CalendarDay,
                               id: generate_id_calendar(@id, "right", day),
                               parent_id: @id,
                               day: day,
@@ -225,7 +225,7 @@
                       <%= for rows <- get_month_or_years(@calendar_right_mode, @right_month ) do %>
                         <div class="flex w-full items-center">
                           <%= for date <- rows do %>
-                              <%= live_component @socket, CalendarMonthYear,
+                              <%= live_component @socket, Phoenix.Components.CalendarMonthYear,
                                   id: "#{@id}_right_column-#{date}",
                                   parent_id: @id,
                                   date: date,
@@ -285,7 +285,7 @@
                     <%= for week <- @week_rows do %>
                       <div class="flex w-full items-center">
                         <%= for day <- week do %>
-                          <%= live_component @socket, CalendarDay,
+                          <%= live_component @socket, Phoenix.Components.CalendarDay,
                             id: "#{@id}_current_month-#{day}",
                             parent_id: @id,
                             day: day,
@@ -306,7 +306,7 @@
                     <%= for rows <- get_month_or_years(@calendar_mode, @current_month ) do %>
                       <div class="flex w-full items-center">
                         <%= for date <- rows do %>
-                          <%= live_component @socket, CalendarMonthYear,
+                          <%= live_component @socket, Phoenix.Components.CalendarMonthYear,
                             id: "#{@id}_current_column-#{date}",
                             parent_id: @id,
                             date: date,
