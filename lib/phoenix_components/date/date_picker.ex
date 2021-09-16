@@ -1,24 +1,14 @@
 defmodule Phoenix.Components.DatePicker do
   @moduledoc """
   Documentation for DatePicker.
-  options {
-    id: "inserted_at_file_date", -> Component id
-    input_name: "inserted_at", -> HTML Input name
-    value: @inserted_at, -> Model value
-    tz_offset: -5, -> TimeZone offset
-    placeholder: "Seleccione", -> HTML Input placeholder
-    picker_mode: :range, -> Picker mode(:single or :range)
-    opens: :left -> How this component will be open(:left or :right)
-    drops: :down -> How this component will be open(:down or :up)
-  }
   """
   use Phoenix.LiveComponent
 
   use Timex
   require Logger
 
-  alias MessonWeb.Components.CalendarDay
-  alias MessonWeb.Components.CalendarMonthYear
+  alias Phoenix.Components.CalendarDay
+  alias Phoenix.Components.CalendarMonthYear
   alias Calendar.Helper
   alias Timex.Timezone
 
