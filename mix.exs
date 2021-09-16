@@ -9,7 +9,7 @@ defmodule PhoenixComponents.Mixfile do
       deps: deps(),
       name: "Phoenix.Components",
       description: "Componentes para Phoenix Liveview",
-      package: package(),
+      package: package()
     ]
   end
 
@@ -25,7 +25,8 @@ defmodule PhoenixComponents.Mixfile do
     [
       {:ex_doc, "~> 0.18", only: :docs},
       {:phoenix_live_view, "~> 0.11.0 or ~> 0.12.0 or ~> 0.13.0 or ~> 0.14.0 or ~> 0.15.0"},
-      {:phoenix_html, "~> 2.11"}
+      {:phoenix_html, "~> 2.11"},
+      {:timex, "~> 3.7.6"}
     ]
   end
 
