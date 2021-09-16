@@ -1,0 +1,333 @@
+<div id="<%= @id %>">
+  <%= if @label != nil do %>
+    <label class="block text-sm font-medium text-gray-500">
+      <%= @label %>
+    </label>
+  <% end %>
+  <div class="mt-1"
+    x-data="{show: false,
+      date_value: '<%= @value %>',
+      open() {this.show = true},
+      close() {this.show = false},
+      setShow(flag) {this.show = flag},
+      isOpen() { return this.show === true}
+    }"
+    x-init="() => {
+      $watch('date_value', value => {
+        if(value != '' && isOpen())
+          this.show = false;
+      })
+    }"
+    >
+    <div class="w-full flex flex-col items-center">
+      <div class="flex flex-col items-center inline-block w-full">
+        <div class="w-full">
+          <div class="p-1 flex border border-gray-300 shadow-sm focus:ring-gray-300 focus:border-gray-300 bg-white rounded">
+            <div @click="open" class="flex flex-auto flex-wrap">
+              <input readonly placeholder="<%= @placeholder %>"
+                    value="<%= if @value != nil do @value end %>"
+                    class="bg-transparent p-1 px-2 appearance-none outline-none h-full w-full text-base sm:text-sm text-gray-500">
+            </div>
+            <div class="<%= if @value == nil do %> hidden <% end %> w-8 py-1 px-1 flex items-center border-gray-200">
+              <button type="button" class="cursor-pointer w-6 h-6 outline-none focus:outline-none"
+                phx-click="clear" phx-target="<%= @myself %>"
+              >
+              <svg class="fill-current h-6 w-6 text-gray-400 hover:text-gray-600 focus:outline-none" role="button" viewBox="0 0 20 20">
+                <path d="M14.348,14.849c-0.469,0.469-1.229,0.469-1.697,0L10,11.819l-2.651,3.029c-0.469,0.469-1.229,0.469-1.697,0
+                c-0.469-0.469-0.469-1.229,0-1.697l2.758-3.15L5.651,6.849c-0.469-0.469-0.469-1.228,0-1.697s1.228-0.469,1.697,0L10,8.183
+                l2.651-3.031c0.469-0.469,1.228-0.469,1.697,0s0.469,1.229,0,1.697l-2.758,3.152l2.758,3.15
+                C14.817,13.62,14.817,14.38,14.348,14.849z" />
+              </svg>
+              </button>
+            </div>
+            <div @click="open" class="w-8 py-1 px-1 flex items-center border-gray-200">
+              <button type="button" class="cursor-pointer w-6 h-6 outline-none focus:outline-none">
+                <svg class="h-6 w-6 text-gray-400"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="w-full relative">
+          <div x-show.transition.origin.top="isOpen()" x-cloak class="absolute shadow top-100 bg-white w-auto <%= if @opens === :left do %> right-0 <% else %> left-0 <% end %> rounded z-auto"  @click.away="close">
+            <div class="flex">
+              <!-- DEFAULT RANGES -->
+              <div class="flex flex-col overflow-y-auto h-auto min-w-max">
+                <%= if @picker_mode === :range do %>
+                  <%= for {k,v} <- @ranges do %>
+                    <div class="cursor-pointer w-full border-gray-100 border-b hover:text-white hover:border-primary-300
+                                <%= if k === @range_selected do %>
+                                  text-white bg-primary-200 hover:bg-primary-200 border-primary-200 hover:border-primary-200
+                                <% else %>
+                                  hover:bg-primary-300
+                                <% end %>""
+                      @click="setShow(<%= k |> is_custom_range?() %> )" phx-click="select_option" phx-value-key="<%= k %>" phx-target="<%= @myself %>">
+                      <div class="flex w-full items-center px-2 py-1.5 border-transparent border-l-2 relative">
+                        <div class="w-full items-center flex justify-between">
+                          <div class="mx-2 leading-5 text-base sm:text-sm"><%= v.name %></div>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
+                <% else %>
+                  <div class="flex flex-col h-full justify-center space-y-1 rounded-l w-32 bg-primary-200 text-white text-center py-8 px-6">
+                    <span class="text-3xl font-thin font-semibold leading-8 tracking-wide uppercase"><%=  @current_month |> get_short_month() %></span>
+                    <span class="text-5xl text-center font-bold leading-12 tracking-wide"><%=  Timex.format!(@current_month, "%d", :strftime) %></span>
+                    <span class="text-xl font-thin font-semibold leading-8 tracking-wide"><%=  Timex.format!(@current_month, "%Y", :strftime) %></span>
+                  </div>
+                <% end %>
+              </div>
+              <!-- CALENDARS-->
+              <%= if @picker_mode === :range do %>
+                <div class="flex border-l border-gray-200 min-w-max h-full <%= if !@show_calendar do %> hidden <% end %>">
+                  <div id="calendar_left" class="flex flex-col space-y-1 w-66 min-h-full ml-2 mr-1 my-1">
+                    <header class="flex items-center">
+                      <div class="flex-grow text-left px-1">
+                        <!-- <h3 class="text-md font-semibold text-gray-800 leading-6 font-semibold tracking-wide"><%= @left_month |> get_header_title(@calendar_mode) %></h3> -->
+                        <button type="button"
+                                phx-click="toogle_calendar_mode"
+                                phx-target="<%= @myself %>"
+                                phx-value-calendar="left"
+                                class="p-1 rounded-lg text-base sm:text-sm font-semibold text-gray-800 leading-5 font-semibold tracking-wide focus:outline-none hover:bg-gray-100">
+                          <%= @left_month |> get_header_title(@calendar_left_mode) %>
+                        </button>
+                      </div>
+                      <div class="flex-none w-auto">
+                        <div class="flex space-x-1">
+                          <button type="button" phx-target="#<%= @id %>" phx-click="prev" phx-value-calendar="left"
+                              class="p-2 inline-block text-sm bg-white rounded-full text-gray-800 focus:outline-none hover:bg-gray-100">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                          </button>
+                          <button type="button" phx-target="#<%= @id %>" phx-click="next" phx-value-calendar="left"
+                              class="p-2 inline-block text-sm bg-white rounded-full text-gray-800 focus:outline-none hover:bg-gray-100">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                              </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </header>
+                    <!-- # CALENDAR LEFT MODE: date -->
+                    <div class="<%= if @calendar_left_mode !== :date do %> hidden <% end %> flex-col min-w-full">
+                      <div class="flex w-full items-center">
+                        <%= for day_name <- @day_names do %>
+                          <div class="text-xs px-2 py-1 text-gray-600 font-semibold">
+                            <%= day_name %>
+                          </div>
+                        <% end %>
+                      </div>
+                      <%= for week <- @week_rows_left do %>
+                        <div class="flex w-full items-center">
+                          <%= for day <- week do %>
+                              <%= live_component @socket, CalendarDay,
+                              id: generate_id_calendar(@id, "left", day),
+                              parent_id: @id,
+                              day: day,
+                              current_month: @left_month,
+                              start_date: @start_date,
+                              end_date: @end_date,
+                              interval: @interval,
+                              min_date: @min_date,
+                              max_date: @right_month,
+                              mode: @picker_mode,
+                              time_zone: @time_zone
+                              %>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+                    <!-- # CALENDAR LEFT MODE: month or year -->
+                    <div class="<%= if @calendar_left_mode === :date do %> hidden <% end %> flex-col min-w-full">
+                      <%= for rows <- get_month_or_years(@calendar_left_mode, @left_month ) do %>
+                        <div class="flex w-full items-center">
+                          <%= for date <- rows do %>
+                              <%= live_component @socket, CalendarMonthYear,
+                                  id: "#{@id}_left_column-#{date}",
+                                  parent_id: @id,
+                                  date: date,
+                                  current_date: @left_month,
+                                  min_date: @min_date,
+                                  max_date: @right_month,
+                                  time_zone: @time_zone,
+                                  calendar: "left",
+                                  calendar_mode: @calendar_left_mode,
+                                  picker_mode: @picker_mode
+                                  %>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+
+                  <div id="calendar_right" class="flex flex-col space-y-1 w-66 min-h-full ml-1 mr-2 my-1">
+                    <header class="flex items-center">
+                      <div class="flex-grow text-left px-1">
+                        <!-- <h3 class="text-md font-semibold text-gray-800 leading-6 font-semibold tracking-wide"><%= @right_month |> get_header_title(@calendar_right_mode) %></h3> -->
+                        <button type="button"
+                                phx-click="toogle_calendar_mode"
+                                phx-target="<%= @myself %>"
+                                phx-value-calendar="right"
+                                class="p-1 rounded-lg text-base sm:text-sm font-semibold text-gray-800 leading-5 font-semibold tracking-wide focus:outline-none hover:bg-gray-100">
+                          <%= @right_month |> get_header_title(@calendar_right_mode) %>
+                        </button>
+                      </div>
+                      <div class="flex-none w-auto">
+                        <div class="flex space-x-1">
+                          <button type="button" phx-target="#<%= @id %>" phx-click="prev" phx-value-calendar="right"
+                              class="p-2 inline-block text-sm bg-white rounded-full text-gray-800 focus:outline-none hover:bg-gray-100">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                          </button>
+                          <button type="button" phx-target="#<%= @id %>" phx-click="next" phx-value-calendar="right"
+                              class="p-2 inline-block text-sm bg-white rounded-full text-gray-800 focus:outline-none hover:bg-gray-100">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                              </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </header>
+                    <!-- # CALENDAR RIGHT MODE: date -->
+                    <div class="<%= if @calendar_right_mode !== :date do %> hidden <% end %> flex-col min-w-full">
+                      <div class="flex w-full items-center">
+                        <%= for day_name <- @day_names do %>
+                          <div class="text-xs px-2 py-1 text-gray-600 font-semibold">
+                            <%= day_name %>
+                          </div>
+                        <% end %>
+                      </div>
+                      <%= for week <- @week_rows_right do %>
+                        <div class="flex w-full items-center">
+                          <%= for day <- week do %>
+                            <%= live_component @socket, CalendarDay,
+                              id: generate_id_calendar(@id, "right", day),
+                              parent_id: @id,
+                              day: day,
+                              current_month: @right_month,
+                              start_date: @start_date,
+                              end_date: @end_date,
+                              interval: @interval,
+                              min_date: @left_month,
+                              max_date: @max_date,
+                              mode: @picker_mode,
+                              time_zone: @time_zone
+                            %>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+                    <!-- # CALENDAR RIGHT MODE: month or year -->
+                    <div class="<%= if @calendar_right_mode === :date do %> hidden <% end %> flex-col min-w-full">
+                      <%= for rows <- get_month_or_years(@calendar_right_mode, @right_month ) do %>
+                        <div class="flex w-full items-center">
+                          <%= for date <- rows do %>
+                              <%= live_component @socket, CalendarMonthYear,
+                                  id: "#{@id}_right_column-#{date}",
+                                  parent_id: @id,
+                                  date: date,
+                                  current_date: @right_month,
+                                  min_date: @left_month,
+                                  max_date: @max_date,
+                                  time_zone: @time_zone,
+                                  calendar: "right",
+                                  calendar_mode: @calendar_right_mode,
+                                  picker_mode: @picker_mode
+                                  %>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              <% else %>
+                <div id="calendar" class="flex flex-col space-y-1 w-66 min-h-full m-1">
+                  <header class="flex items-center">
+                    <div class="flex-grow text-left px-1">
+                      <!-- <h3 class="text-md font-semibold text-gray-800 leading-6 font-semibold tracking-wide"><%= @right_month |> get_header_title(@calendar_right_mode) %></h3> -->
+                      <button type="button"
+                              phx-click="toogle_calendar_mode"
+                              phx-target="<%= @myself %>"
+                              class="p-1 rounded-lg text-base sm:text-sm font-semibold text-gray-800 leading-5 font-semibold tracking-wide focus:outline-none hover:bg-gray-100">
+                        <%= @current_month |> get_header_title(@calendar_mode) %>
+                      </button>
+                    </div>
+                    <div class="flex-none w-auto">
+                      <div class="flex space-x-1">
+                        <button type="button" phx-target="#<%= @id %>" phx-click="prev"
+                            class="p-2 inline-block text-sm bg-white rounded-full text-gray-800 focus:outline-none hover:bg-gray-100">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                          </svg>
+                        </button>
+                        <button type="button" phx-target="#<%= @id %>" phx-click="next"
+                            class="p-2 inline-block text-sm bg-white rounded-full text-gray-800 focus:outline-none hover:bg-gray-100">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </header>
+
+                  <!-- # CALENDAR CURRENT MODE: date -->
+                  <div class="<%= if @calendar_mode !== :date do %> hidden <% end %> flex-col w-full min-w-full">
+                    <div class="flex w-full items-center">
+                      <%= for day_name <- @day_names do %>
+                        <div class="text-xs px-2 py-1 text-gray-600 font-semibold">
+                          <%= day_name %>
+                        </div>
+                      <% end %>
+                    </div>
+                    <%= for week <- @week_rows do %>
+                      <div class="flex w-full items-center">
+                        <%= for day <- week do %>
+                          <%= live_component @socket, CalendarDay,
+                            id: "#{@id}_current_month-#{day}",
+                            parent_id: @id,
+                            day: day,
+                            current_month: @current_month,
+                            date: @current_date,
+                            min_date: @min_date,
+                            max_date: @max_date,
+                            mode: @picker_mode,
+                            time_zone: @time_zone
+                          %>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </div>
+
+                  <!-- # CALENDAR CURRENT MODE: month or year -->
+                  <div class="<%= if @calendar_mode === :date do %> hidden <% end %> flex-col min-w-full">
+                    <%= for rows <- get_month_or_years(@calendar_mode, @current_month ) do %>
+                      <div class="flex w-full items-center">
+                        <%= for date <- rows do %>
+                          <%= live_component @socket, CalendarMonthYear,
+                            id: "#{@id}_current_column-#{date}",
+                            parent_id: @id,
+                            date: date,
+                            current_date: @current_month,
+                            min_date: @min_date,
+                            max_date: @max_date,
+                            time_zone: @time_zone,
+                            calendar: "current",
+                            calendar_mode: @calendar_mode,
+                            picker_mode: @picker_mode
+                          %>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

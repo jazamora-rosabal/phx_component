@@ -1,0 +1,44 @@
+<div id="<%= @id %>"
+  phx-target="#<%= @parent_id %>"
+  phx-click="pick-date"
+  phx-value-date="<%= @day |> get_date() %>"
+  phx-value-block="<%= is_block?(@day, @current_month, @max_date) %>"
+  phx-value-mode="<%= @mode %>"
+  x-data="{ startDate: <%= if @mode === :range && @start_date != nil do %> '<%= @start_date |> get_date_to_js() %>' <% else %> null <% end %>,
+            endDate: <%= if @mode === :range && @end_date != nil do %> '<%= @end_date |> get_date_to_js() %>' <% else %> null <% end %>,
+            mode: '<%= @mode |> Atom.to_string() %>',
+            day: '<%= @day |> get_date_to_js() %>',
+            parentId: '<%= @parent_id %>',
+            showHoverClass() {
+              if(this.mode === 'range' && this.endDate === null && this.startDate != null){
+                  let calendar = document.getElementById(this.parentId);
+                  if(calendar != null){
+                    available_days = calendar.getElementsByClassName('available-day');
+                    for(i=0; i< available_days.length; i++){
+                      element = document.getElementById(available_days[i].id)
+                      dayId = available_days[i].id.split('month-')[1];
+                      if(this.isAfterStartDate(dayId) && this.isBeforeThatDate(dayId, this.day)){
+                        if(this.isEqualsStartDate(dayId)){
+                          element.classList.add('bg-primary-200', 'text-white');
+                        }else{
+                          element.classList.add('bg-primary-300', 'text-white');
+                          element.classList.remove('hover:bg-gray-200');
+                        }
+                      }else{
+                        element.classList.remove('bg-primary-200','bg-primary-300', 'text-white');
+                      }
+                    }
+                  }
+              }
+            },
+            getValueOfDate(dateString) { return new Date(dateString).valueOf() },
+            isEqualsStartDate(day) { return this.getValueOfDate(day) == this.getValueOfDate(this.startDate) },
+            isEqualsThatDate(day, hoverDate) { return this.getValueOfDate(day) == this.getValueOfDate(hoverDate)  },
+            isAfterStartDate(day) { return this.getValueOfDate(day) >= this.getValueOfDate(this.startDate) },
+            isBeforeThatDate(day, hoverDate) { return this.getValueOfDate(day) <= this.getValueOfDate(hoverDate) }
+          }"
+  @mouseover="showHoverClass()"
+  class="text-xs text-center border p-2 w-full <%= @day_class %>"
+>
+  <%= Timex.format!(@day, "%e", :strftime) %>
+</div>

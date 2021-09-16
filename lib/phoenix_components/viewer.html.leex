@@ -1,0 +1,85 @@
+<div class="flex-1 min-w-0 bg-white xl:flex" id="<%= @id %>">
+  <%= if Enum.empty?(@node.children) do %>
+    <div class="w-full bg-white shadow-lg overflow-hidden border border-gray-200 py-20 text-center sm:rounded-lg">
+      <svg xmlns="http://www.w3.org/2000/svg" width="191" height="149.409" class="mt-10" viewBox="0 0 191 149.409" style="display: inline;">
+      <defs>
+          <style>.a{fill:#9fa6b2;fill-rule:evenodd;}.b{fill:#fff;stroke:#9fa6b2;stroke-width:2px;}</style>
+      </defs>
+      <g transform="translate(-666 -276.621)">
+        <g transform="translate(666 276.621)">
+        <g transform="translate(0 0)">
+            <path class="a" d="M84.16,140.692h63.586v-4.713H84.16ZM158.43,126.2H49.8v83.934L60.93,173.75l9.788-32.024a1.066,1.066,0,0,1,.06-.2l.01-.011c.03-.07.06-.128.09-.186v-.012c.04-.046.071-.1.111-.152h0l.04-.058h.01l.081-.093h.01a1.176,1.176,0,0,1,.514-.291h0a.949.949,0,0,1,.262-.035h9.777v-6.144a1.345,1.345,0,0,1,1.239-1.431h66.063a1.352,1.352,0,0,1,1.239,1.431v6.144h8.206Zm.362,90.835H50.318l22.454-73.484H181.257ZM49.281,228.279a1.447,1.447,0,0,1,0-2.863H140.6a1.448,1.448,0,0,1,0,2.863ZM95.4,235.947a1.446,1.446,0,0,1,0-2.863h75.468a1.446,1.446,0,0,1,0,2.863Zm83.191,0a1.446,1.446,0,0,1,0-2.863h9.435a1.446,1.446,0,0,1,0,2.863ZM27.24,235.715a1.446,1.446,0,0,1,0-2.863H63a1.446,1.446,0,0,1,0,2.863ZM175.5,132.64a1.236,1.236,0,0,0,1.108-.8,1.434,1.434,0,0,0-1.108-2.06H173.02a1.253,1.253,0,0,0-1.107.8,1.434,1.434,0,0,0,1.107,2.06Zm9.9,0a1.235,1.235,0,0,0,1.107-.8,1.434,1.434,0,0,0-1.107-2.06h-2.478a1.254,1.254,0,0,0-1.108.8,1.434,1.434,0,0,0,1.108,2.06Zm9.9,0a1.236,1.236,0,0,0,1.108-.8,1.434,1.434,0,0,0-1.108-2.06h-2.477a1.253,1.253,0,0,0-1.107.8,1.434,1.434,0,0,0,1.107,2.06Zm-3.131,7.622c-.584,1.664,1.682,2.828,2.316.989l.866-2.676a1.532,1.532,0,0,0-.665-1.815,1.2,1.2,0,0,0-1.661.814Zm-3.443,10.716c-.574,1.664,1.692,2.828,2.326.99l.856-2.676a1.517,1.517,0,0,0-.665-1.8,1.181,1.181,0,0,0-1.651.814Zm-3.434,10.729c-.574,1.664,1.681,2.828,2.316.99l.867-2.676a1.533,1.533,0,0,0-.665-1.815,1.2,1.2,0,0,0-1.661.814Zm-3.443,10.717c-.575,1.664,1.692,2.828,2.325,1l.856-2.687a1.523,1.523,0,0,0-.665-1.8,1.181,1.181,0,0,0-1.651.814Zm-3.434,10.729c-.574,1.664,1.682,2.828,2.317.989l.866-2.676a1.533,1.533,0,0,0-.665-1.816,1.2,1.2,0,0,0-1.661.814Zm-3.443,10.717c-.574,1.676,1.692,2.828,2.326,1l.856-2.688a1.523,1.523,0,0,0-.665-1.8,1.188,1.188,0,0,0-1.651.814ZM171.53,204.6c-.584,1.675,1.682,2.828,2.316,1l.866-2.688a1.522,1.522,0,0,0-.674-1.8,1.184,1.184,0,0,0-1.652.814Zm-8.408-74.822a1.266,1.266,0,0,0-1.108.8,1.439,1.439,0,0,0,1.108,2.06H165.6a1.25,1.25,0,0,0,1.118-.8,1.438,1.438,0,0,0-1.118-2.06ZM59.189,123.342h35.06l-8.317-7.413H59.189Z" transform="translate(-26.001 -115.929)"/>
+        </g>
+        </g>
+        <g transform="translate(770.274 345.124)">
+        <path class="b" d="M76.513,78.747,48.184,49.921a28.706,28.706,0,1,1,4.5-5.258l31.67,25.675a4.312,4.312,0,0,1,.213,6.094l-1.961,2.1a4.311,4.311,0,0,1-6.094.212Z"/>
+        <g transform="translate(5.161 5.161)">
+            <path class="b" d="M0,23.72A23.72,23.72,0,1,1,23.719,47.44,23.72,23.72,0,0,1,0,23.72Z"/>
+        </g>
+        </g>
+      </g>
+      </svg>
+      <div class="py-5 mb-10">
+        <span class="text-gray-500 text-sm leading-6 font-medium uppercase">No existen documentos para mostrar</span>
+      </div>
+    </div>
+  <% else %>
+    <div x-data="{open: false}" class="relative inset-y-0 left-0 flex">
+      <div
+          class="flex flex-col py-2 bg-white shadow-xl transition-all ease-in-out duration-500"
+          :class="open ? 'ml-0 overflow-auto' : '-ml-64'"
+          x-cloak
+      >
+        <div class="px-4 sm:px-6">
+          <div class="flex items-start justify-between">
+            <h2 class="text-md uppercase">Documentos</h2>
+          </div>
+        </div>
+        <div class="mt-2 relative flex-1 px-4 sm:px-6 w-64 max-h-80 space-y-4">
+          <!-- Miniaturas  -->
+          <%= for child <- @node.children do %>
+            <div class="relative rounded border bg-gray-100">
+              <div phx-click="selected" phx-value-selected="<%=child["unique_id"] %>" phx-target="<%= @myself %>" class="cursor-pointer absolute" style="width: 100%; height: 70%;"></div>
+              <div class="px-2 pt-2">
+                <div class="h-full border border-b-0" aria-hidden="true">
+                  <div class="overflow-hidden">
+                    <iframe class="-m-4" style="width: 221px;" frameborder="0" src="/nodeservice/preview/<%=child["unique_id"] %>#toolbar=0&navpanes=0&scrollbar=0&view=fitH&statusbar=0&transparent=0">
+                    </iframe>
+                  </div>
+                </div>
+              </div>
+              <div class="text-xs bg-gray-200 p-1" style="margin-left: -1px">
+                <div class="truncate"><%= child["description"] %></div>
+                <div class="truncate text-gray-600">Adjuntado: <%= child["inserted_at"] |> convert_date |> formatdate %></div>
+                <div class="text-right mr-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12.863" height="12.924" viewBox="0 0 12.863 12.924" class="inline-block">
+                    <g id="Grupo_4246" data-name="Grupo 4246" transform="translate(-539.621 -369.652)">
+                      <path id="Trazado_720" data-name="Trazado 720" d="M0,1.955,1.955,0m0,0L3.909,1.955M1.955,0V8.8" transform="translate(548.22 371.152) rotate(45)" fill="none" stroke="#9498a0" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+                      <path id="Trazado_1318" data-name="Trazado 1318" d="M3760.14,12328.6h-3.268a1.544,1.544,0,0,0-.781.438,1.822,1.822,0,0,0-.309.892v6.191a2.267,2.267,0,0,0,.242,1.114,1.676,1.676,0,0,0,.848.593h6.4l.874-.06a1.876,1.876,0,0,0,.467-.266c.228-.182.256-.942.256-.942v-2.864" transform="translate(-3215.409 -11956.001)" fill="none" stroke="#9498a0" stroke-linecap="round" stroke-width="1.5"/>
+                    </g>
+                  </svg>
+
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13.5" height="12.674" viewBox="0 0 13.5 12.674" class="inline-block">
+                    <path id="Trazado_611" data-name="Trazado 611" d="M148,444.005v.667a2.083,2.083,0,0,0,2.156,2h7.188a2.083,2.083,0,0,0,2.156-2v-.667m-2.875-2.668-2.875,2.668m0,0-2.875-2.668m2.875,2.668V436" transform="translate(-147 -435)" fill="none" stroke="#9498a0" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          <!-- /End -->
+        </div>
+      </div>
+
+      <div class="relative w-4 flex items-start h-full bg-gray-100 pt-4 shadow-md">
+        <button type="button" class="absolute rounded-full border border-gray-300 shadow-md bg-white left-0 transition-all duration-1000 ease-in-out transform" :class="{ 'rotate-180': open }" @click="open = !open">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Projects List -->
+    <div class="bg-white lg:min-w-0 lg:flex-1">
+      <iframe src="/nodeservice/preview/<%= @selected || @node.selected %>#view=fitH" class="b-0 h-full w-full"></iframe>
+    </div>
+  <% end %>
+</div>
