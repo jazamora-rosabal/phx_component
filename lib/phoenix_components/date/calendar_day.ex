@@ -47,12 +47,12 @@ defmodule Phoenix.Components.CalendarDay do
   defp after_max_date?(_), do: false
 
   defp selected_day?(%{mode: :range, day: day, start_date: start_date, end_date: end_date}) do
-    (start_date !== nil && Helper.same_date(day, start_date)) ||
-      (end_date !== nil && Helper.same_date(day, end_date))
+    (start_date !== nil && Helper.same_date?(day, start_date)) ||
+      (end_date !== nil && Helper.same_date?(day, end_date))
   end
 
   defp selected_day?(%{day: day, date: date}) when date != nil do
-    Helper.same_date(day, date)
+    Helper.same_date?(day, date)
   end
 
   defp selected_day?(_), do: false
@@ -70,7 +70,7 @@ defmodule Phoenix.Components.CalendarDay do
   defp check_interval?(false, day, interval),
     do: day in interval
 
-  defp check_interval?(_, _),
+  defp check_interval?(true, _),
     do: false
 
   defp today?(assigns) do

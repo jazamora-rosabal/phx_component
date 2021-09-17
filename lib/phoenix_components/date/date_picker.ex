@@ -546,9 +546,9 @@ defmodule Phoenix.Components.DatePicker do
     |> Enum.chunk_every(7)
   end
 
-  defp get_short_month(date) do
-    Timex.format!(date, "%B", :strftime) |> Timex.month_to_num() |> Helper.short_month()
-  end
+  # defp get_short_month(date) do
+  #   Timex.format!(date, "%B", :strftime) |> Timex.month_to_num() |> Helper.short_month()
+  # end
 
   defp is_custom_range?(key) do
     key === String.to_atom("custom")
