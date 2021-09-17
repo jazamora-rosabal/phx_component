@@ -35,8 +35,8 @@ defmodule Phoenix.Components.CalendarDay do
     end
   end
 
-  defp other_month?(assigns) do
-    Map.take(assigns.day, [:year, :month]) != Map.take(assigns.current_month, [:year, :month])
+  defp other_month?(%{day: day, current_month: current_month}) do
+    Map.take(day, [:year, :month]) != Map.take(current_month, [:year, :month])
   end
 
   defp other_month?(_assigns), do: false
