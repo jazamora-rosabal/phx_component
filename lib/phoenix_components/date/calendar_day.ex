@@ -49,12 +49,12 @@ defmodule Phoenix.Components.CalendarDay do
   defp after_max_date?(_), do: false
 
   defp selected_day?(%{mode: :range, day: day, start_date: start_date, end_date: end_date}) do
-    (start_date !== nil && Helper.same_date?(day, start_date)) ||
-      (end_date !== nil && Helper.same_date?(day, end_date))
+    (start_date !== nil && same_date?(day, start_date)) ||
+      (end_date !== nil && same_date?(day, end_date))
   end
 
   defp selected_day?(%{day: day, date: date}) when date != nil do
-    Helper.same_date?(day, date)
+    same_date?(day, date)
   end
 
   defp selected_day?(_), do: false
@@ -89,5 +89,9 @@ defmodule Phoenix.Components.CalendarDay do
 
   def is_block?(assigns) do
     after_max_date?(assigns) || other_month?(assigns)
+  end
+
+  defp same_date?(date0, date1) do
+    Map.take(date0, [:year, :month, :day]) == Map.take(date1, [:year, :month, :day])
   end
 end

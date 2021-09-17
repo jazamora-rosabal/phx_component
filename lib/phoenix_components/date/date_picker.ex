@@ -723,10 +723,6 @@ defmodule Calendar.Helper do
     date |> Timex.after?(max_date)
   end
 
-  def same_date?(date0, date1) do
-    Map.take(date0, [:year, :month, :day]) == Map.take(date1, [:year, :month, :day])
-  end
-
   defp before_min_date_with_same_years(same_year, min_date_month) do
     case same_year do
       true -> if min_date_month === 12, do: true, else: false
