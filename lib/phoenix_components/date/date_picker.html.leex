@@ -70,12 +70,6 @@
                       </div>
                     </div>
                   <% end %>
-                <% else %>
-                  <div class="flex flex-col h-full justify-center space-y-1 rounded-l w-32 bg-primary-200 text-white text-center py-8 px-6">
-                    <span class="text-3xl font-thin font-semibold leading-8 tracking-wide uppercase"><%=  @current_month |> get_short_month() %></span>
-                    <span class="text-5xl text-center font-bold leading-12 tracking-wide"><%=  Timex.format!(@current_month, "%d", :strftime) %></span>
-                    <span class="text-xl font-thin font-semibold leading-8 tracking-wide"><%=  Timex.format!(@current_month, "%Y", :strftime) %></span>
-                  </div>
                 <% end %>
               </div>
               <!-- CALENDARS-->

@@ -18,8 +18,6 @@ defmodule Phoenix.Components do
       import Phoenix.Components.Paginate
       import Phoenix.Components.Viewer
       import Phoenix.Components.DatePicker
-      import Phoenix.Components.CalendarDay
-      import Phoenix.Components.CalendarMonthYear
     end
   end
 
