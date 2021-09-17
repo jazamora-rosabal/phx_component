@@ -13,7 +13,7 @@ defmodule Phoenix.Components.CalendarMonthYear do
     }
   end
 
-  defp column_class(assigns) do
+  defp column_class(%{calendar_mode: mode} = assigns) do
     cond do
       after_max_date?(assigns) ->
         "border-transparent text-gray-300 cursor-not-allowed line-through"
@@ -27,56 +27,62 @@ defmodule Phoenix.Components.CalendarMonthYear do
       true ->
         "border-transparent text-black bg-white hover:bg-gray-200 cursor-pointer"
     end
+    |> x_padding(mode)
   end
 
-  defp after_max_date?(assigns) do
-    after_max_date?(
-      assigns.picker_mode,
-      assigns.calendar_mode,
-      assigns.calendar,
-      assigns.date,
-      assigns.max_date
-    )
+  defp column_class(_assigns) do
+    "border-transparent text-black bg-white hover:bg-gray-200 cursor-pointer"
   end
 
-  defp after_max_date?(picker_mode, calendar_mode, calendar, date, max_date) do
-    if max_date !== nil,
-      do: Helper.after_max_date?(picker_mode, calendar_mode, calendar, date, max_date),
-      else: false
-  end
+  defp after_max_date?(%{max_date: max_date} = assigns) when max_date == nil, do: false
 
-  defp before_min_date?(assigns) do
-    before_min_date?(
-      assigns.picker_mode,
-      assigns.calendar_mode,
-      assigns.calendar,
-      assigns.date,
-      assigns.min_date
-    )
-  end
+  defp after_max_date?(
+         %{
+           picker_mode: picker_mode,
+           calendar_mode: calendar_mode,
+           calendar: calendar,
+           date: date,
+           max_date: max_date
+         } = assigns
+       ),
+       do: Helper.after_max_date?(picker_mode, calendar_mode, calendar, date, max_date)
 
-  def before_min_date?(picker_mode, calendar_mode, calendar, date, min_date) do
-    if min_date != nil,
-      do: Helper.before_min_date?(picker_mode, calendar_mode, calendar, date, min_date),
-      else: false
-  end
+  defp after_max_date?(_), do: false
+
+  defp before_min_date?(%{min_date: min_date} = assigns) when min_date == nil, do: false
+
+  defp before_min_date?(
+         %{
+           picker_mode: picker_mode,
+           calendar_mode: calendar_mode,
+           calendar: calendar,
+           date: date,
+           min_date: min_date
+         } = assigns
+       ),
+       do: Helper.before_min_date?(picker_mode, calendar_mode, calendar, date, min_date)
+
+  defp before_min_date?(_), do: false
 
   defp current_month_or_year?(assigns) do
     Map.take(assigns.date, [:year, :month]) == Map.take(assigns.current_date, [:year, :month])
   end
 
-  defp get_value(date, calendar_mode) do
-    if calendar_mode === :month,
-      do: date |> Timex.format!("%b", :strftime) |> Timex.month_to_num() |> Helper.short_month(),
-      else: Timex.format!(date, "%Y", :strftime)
+  defp get_value(date, :month),
+    do: date |> Timex.format!("%b", :strftime) |> Timex.month_to_num() |> Helper.short_month()
+
+  defp get_value(date, _),
+    do: Timex.format!(date, "%Y", :strftime)
+
+  defp is_block?(assigns) do
+    before_min_date?(assigns) || after_max_date?(assigns)
   end
 
-  # defp get_date(date) do
-  #   Timex.format!(date, "%d/%m/%Y", :strftime)
-  # end
+  defp x_padding(clazz, :month) do
+    "#{clazz} px-8"
+  end
 
-  defp is_block?(date, min_date, max_date, picker_mode, calendar_mode, calendar) do
-    picker_mode |> before_min_date?(calendar_mode, calendar, date, min_date) ||
-      picker_mode |> after_max_date?(calendar_mode, calendar, date, max_date)
+  defp x_padding(clazz, _) do
+    "#{clazz} px-7"
   end
 end

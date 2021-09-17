@@ -3,7 +3,7 @@
   phx-click="change_month_or_year"
   phx-value-date="<%= @date %>"
   phx-value-calendar="<%= @calendar %>"
-  phx-value-block="<%= is_block?(@date, @min_date, @max_date, @picker_mode, @calendar_mode, @calendar) %>"
-  class="w-1/3 text-sm py-4 px-8 lowercase text-center border <%= @column_class %>">
+  phx-value-block="<%= is_block?(@socket.assigns) %>"
+  class="w-1/3 text-sm py-4 lowercase text-center border <%= @column_class %>">
   <%= @date |> get_value(@calendar_mode)  %>
 </div>
