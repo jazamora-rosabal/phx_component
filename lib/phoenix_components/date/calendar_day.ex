@@ -39,6 +39,8 @@ defmodule Phoenix.Components.CalendarDay do
     Map.take(assigns.day, [:year, :month]) != Map.take(assigns.current_month, [:year, :month])
   end
 
+  defp other_month?(_assigns), do: false
+
   defp after_max_date?(%{max_date: max_date}) when max_date == nil, do: false
 
   defp after_max_date?(%{day: day, max_date: max_date}),
@@ -67,11 +69,11 @@ defmodule Phoenix.Components.CalendarDay do
   defp on_interval?(_),
     do: false
 
+  defp check_interval?(true, _, _),
+    do: false
+
   defp check_interval?(false, day, interval),
     do: day in interval
-
-  defp check_interval?(true, _),
-    do: false
 
   defp today?(assigns) do
     assigns.day |> Helper.today?(assigns.time_zone)
