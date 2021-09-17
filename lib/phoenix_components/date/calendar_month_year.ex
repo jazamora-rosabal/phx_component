@@ -22,7 +22,7 @@ defmodule Phoenix.Components.CalendarMonthYear do
         "border-transparent text-gray-300 cursor-not-allowed line-through"
 
       current_month_or_year?(assigns) ->
-        " border-dashed border-gray-600 hover:bg-gray-200 cursor-pointer"
+        "border-dashed border-gray-600 hover:bg-gray-200 cursor-pointer"
 
       true ->
         "border-transparent text-black bg-white hover:bg-gray-200 cursor-pointer"
@@ -30,36 +30,31 @@ defmodule Phoenix.Components.CalendarMonthYear do
     |> x_padding(mode)
   end
 
-  defp column_class(_assigns) do
-    "border-transparent text-black bg-white hover:bg-gray-200 cursor-pointer"
-  end
+  defp column_class(_assigns),
+    do: "border-transparent text-black bg-white hover:bg-gray-200 cursor-pointer"
 
-  defp after_max_date?(%{max_date: max_date} = assigns) when max_date == nil, do: false
+  defp after_max_date?(%{max_date: max_date}) when max_date == nil, do: false
 
-  defp after_max_date?(
-         %{
-           picker_mode: picker_mode,
-           calendar_mode: calendar_mode,
-           calendar: calendar,
-           date: date,
-           max_date: max_date
-         } = assigns
-       ),
+  defp after_max_date?(%{
+         picker_mode: picker_mode,
+         calendar_mode: calendar_mode,
+         calendar: calendar,
+         date: date,
+         max_date: max_date
+       }),
        do: Helper.after_max_date?(picker_mode, calendar_mode, calendar, date, max_date)
 
   defp after_max_date?(_), do: false
 
-  defp before_min_date?(%{min_date: min_date} = assigns) when min_date == nil, do: false
+  defp before_min_date?(%{min_date: min_date}) when min_date == nil, do: false
 
-  defp before_min_date?(
-         %{
-           picker_mode: picker_mode,
-           calendar_mode: calendar_mode,
-           calendar: calendar,
-           date: date,
-           min_date: min_date
-         } = assigns
-       ),
+  defp before_min_date?(%{
+         picker_mode: picker_mode,
+         calendar_mode: calendar_mode,
+         calendar: calendar,
+         date: date,
+         min_date: min_date
+       }),
        do: Helper.before_min_date?(picker_mode, calendar_mode, calendar, date, min_date)
 
   defp before_min_date?(_), do: false

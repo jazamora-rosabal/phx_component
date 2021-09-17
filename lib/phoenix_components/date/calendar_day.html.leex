@@ -2,7 +2,7 @@
   phx-target="#<%= @parent_id %>"
   phx-click="pick-date"
   phx-value-date="<%= @day |> get_date() %>"
-  phx-value-block="<%= is_block?(@day, @current_month, @max_date) %>"
+  phx-value-block="<%= is_block?(@socket.assigns) %>"
   phx-value-mode="<%= @mode %>"
   x-data="{ startDate: <%= if @mode === :range && @start_date != nil do %> '<%= @start_date |> get_date_to_js() %>' <% else %> null <% end %>,
             endDate: <%= if @mode === :range && @end_date != nil do %> '<%= @end_date |> get_date_to_js() %>' <% else %> null <% end %>,

@@ -723,6 +723,10 @@ defmodule Calendar.Helper do
     date |> Timex.after?(max_date)
   end
 
+  def same_date?(date0, date1) do
+    Map.take(date0, [:year, :month, :day]) == Map.take(date1, [:year, :month, :day])
+  end
+
   defp before_min_date_with_same_years(same_year, min_date_month) do
     case same_year do
       true -> if min_date_month === 12, do: true, else: false
@@ -771,54 +775,3 @@ defmodule Calendar.Helper do
   def short_month(11), do: "Nov"
   def short_month(12), do: "Dic"
 end
-
-# maxDate: moment(),
-# 		autoUpdateInput: false,
-# 		startDate: moment(),
-# 		endDate: moment(),
-# 		opens: "left",
-# 		autoApply: true,
-# 		drops: hook.el.dataset.rangeDrops,
-# 		ranges: {
-# 			'Hoy': [moment(), moment()],
-# 			'Ayer': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-# 			'Últimos 7 días': [moment().subtract(6, 'days'), moment()],
-# 			'Últimos 30 días': [moment().subtract(29, 'days'), moment()],
-# 			'Mes actual': [moment().startOf('month'), moment().endOf('month')],
-# 			'Mes pasado': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-# 		},
-# 		locale: {
-# 			"direction": "ltr",
-# 			"format": "DD/MM/YYYY",
-# 			"separator": " - ",
-# 			"applyLabel": "Seleccionar",
-# 			"cancelLabel": "Limpiar",
-# 			"fromLabel": "Desde",
-# 			"toLabel": "Hasta",
-# 			"customRangeLabel": "Personalizar",
-# 			"daysOfWeek": [
-# 				"Do",
-# 				"Lu",
-# 				"Ma",
-# 				"Mi",
-# 				"Ju",
-# 				"Vi",
-# 				"Sa"
-# 			],
-# 			"monthNames": [
-# 				"Enero",
-# 				"Febrero",
-# 				"Marzo",
-# 				"Abril",
-# 				"Mayo",
-# 				"Junio",
-# 				"Julio",
-# 				"Agosto",
-# 				"Septiembre",
-# 				"Octubre",
-# 				"Noviembre",
-# 				"Diciembre"
-# 			],
-# 			"firstDay": 1
-# 		}
-# 	});
