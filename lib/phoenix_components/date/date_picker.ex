@@ -60,7 +60,7 @@ defmodule Phoenix.Components.DatePicker do
      |> set_time_zone()
      |> set_min_date()
      |> set_max_date()
-     |> IO.inspect(label: "BIG-SOCKET")
+     |> IO.inspect(limit: :infinity)
      |> set_ranges()
      # |> update_picker_mode_single()
      # |> update_picker_mode_range()
