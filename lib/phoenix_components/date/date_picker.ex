@@ -570,7 +570,7 @@ defmodule Phoenix.Components.DatePicker do
       ),
       do: socket |> assign(range_options: build_ranges(ranges, time_zone, custom_range))
 
-  def ranges_definitions(socket), do: socket
+  def ranges_definitions(socket), do: socket |> assign(range_options: [])
 
   defp custom_range(), do: [custom: %{dates: [], label: "Personalizado"}]
 
