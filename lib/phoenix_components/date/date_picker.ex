@@ -594,7 +594,7 @@ defmodule Phoenix.Components.DatePicker do
   end
 
   defp nil_range(nil), do: true
-  defp nil_range(%Calendar.Range{}), do: false
+  defp nil_range(_), do: false
 
   defp add_custom_range(r, true), do: r ++ custom_range()
   defp add_custom_range(r, _), do: r
