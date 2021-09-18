@@ -511,7 +511,7 @@ defmodule Phoenix.Components.DatePicker do
     1..12 |> Enum.map(&Timex.shift(date, months: &1 - current_month)) |> Enum.chunk_every(3)
   end
 
-  defp default_ranges() do
+  defp default_ranges(time_zone) do
     [
       today: %{dates: Helper.now(time_zone) |> range_in_days(), label: "Hoy"},
       yesterday: %{
@@ -544,7 +544,7 @@ defmodule Phoenix.Components.DatePicker do
           }
         } = socket
       ),
-      do: socket |> assigns(range_options: default_ranges())
+      do: socket |> assigns(range_options: default_ranges(time_zone))
 
   def range_definition(
         %{
@@ -554,7 +554,7 @@ defmodule Phoenix.Components.DatePicker do
           }
         } = socket
       ),
-      do: socket |> assigns(range_options: default_ranges() ++ custom_range())
+      do: socket |> assigns(range_options: default_ranges(time_zone) ++ custom_range())
 
   def range_definition(
         %{
@@ -564,31 +564,33 @@ defmodule Phoenix.Components.DatePicker do
           }
         } = socket
       ),
-      do: socket |> assigns(range_options: build_ranges(ranges, custom_range))
+      do: socket |> assigns(range_options: build_ranges(ranges, time_zone, custom_range))
 
   defp custom_range(), do: [custom: %{dates: [], label: "Personalizado"}]
 
-  defp build_ranges(ranges, custom_range) when is_list(ranges) do
+  defp build_ranges(ranges, time_zone, custom_range) when is_list(ranges) do
     ranges
     |> Enum.map(&Calendar.Range.new/1)
     |> Enum.reject(&nil_range/1)
     |> case do
       [] ->
         Logger.info("Definiendo rangos por defecto.")
-        default_ranges()
+        default_ranges(time_zone)
 
       r ->
-        r |> add_custom_range(custom_range)
+        IO.inspect(r |> Enum.take(8), label: "Calendar.Rangos")
+        # r |> Enum.take(8) |> add_custom_range(custom_range)
+        default_ranges(time_zone)
     end
   end
 
-  defp build_ranges(ranges, _custom_range) do
+  defp build_ranges(ranges, time_zone, _custom_range) do
     Logger.warn(
       "La declaracion de rangos, no cumple con la especificacion definida para el componente.
       #{inspect(ranges)}"
     )
 
-    default_ranges()
+    default_ranges(time_zone)
   end
 
   defp nil_range(nil), do: true
