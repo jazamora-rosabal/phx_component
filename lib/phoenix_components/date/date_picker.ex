@@ -50,6 +50,9 @@ defmodule Phoenix.Components.DatePicker do
   end
 
   def update(assigns, socket) do
+    IO.inspect(socket.assigns, label: "SOCKET")
+    IO.inspect(assigns, label: "Assigns")
+
     {:ok,
      socket
      |> assign(assigns)
