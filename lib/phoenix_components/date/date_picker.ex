@@ -79,8 +79,12 @@ defmodule Phoenix.Components.DatePicker do
   defp set_min_date(%{assigns: %{time_zone: time_zone}} = socket),
     do: socket |> assign(:min_date, Helper.one_hundred_years_ago(time_zone))
 
+  defp set_min_date(socket), do: socket
+
   defp set_max_date(%{assigns: %{time_zone: time_zone}} = socket),
     do: socket |> assign(:max_date, Helper.one_hundred_years_after(time_zone))
+
+  defp set_max_date(socket), do: socket
 
   defp set_ranges(%{assigns: %{picker_mode: :range}} = socket),
     do: socket |> ranges_definitions()
@@ -119,6 +123,8 @@ defmodule Phoenix.Components.DatePicker do
 
     socket |> set_values_to_picker_mode_range(left_month, right_month)
   end
+
+  defp update_picker(socket), do: socket
 
   def handle_event("clear", _, socket) do
     send_values(socket.assigns.field_name)
