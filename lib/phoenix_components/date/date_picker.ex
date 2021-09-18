@@ -63,7 +63,7 @@ defmodule Phoenix.Components.DatePicker do
   end
 
   defp set_data(%{assigns: %{value: value, range_selected: range_selected}} = socket)
-       when value === nil && range_selected != nil,
+       when value == nil and range_selected != nil,
        do: socket |> assign(range_selected: nil) |> assign(show_calendar: false)
 
   defp set_data(socket), do: socket
