@@ -29,39 +29,96 @@ defmodule Phoenix.Components.DatePicker do
     calendar_mode: :date
   }
 
+  @options %{
+    label: nil,
+    placeholder: "Seleccione",
+    opens: :left,
+    custom_range?: false,
+    ranges: []
+  }
+
   def mount(socket) do
     {:ok,
      socket
      |> assign(@default_data)
-     |> assign(:field_name, "date_field")
-     |> assign(label: nil)
-     |> assign(placeholder: "Seleccione")
+     |> assign(:field_name, "field_date")
      |> assign(min_date: nil)
      |> assign(max_date: nil)
-     |> assign(opens: :left)
      |> assign(picker_mode: :single)
+     |> assign(options: @options)
      |> assign(day_names: day_names(@week_start_at))
      |> assign(left_month: Timex.now() |> Timex.shift(months: -1))}
   end
 
   def update(assigns, socket) do
-    # tz_offset = get_tz_offset(assigns)
-    socket =
-      if assigns.value === nil && socket.assigns.range_selected != nil,
-        do: socket |> assign(range_selected: nil) |> assign(show_calendar: false),
-        else: socket
-
-    time_zone = get_time_zone(assigns)
-
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:time_zone, time_zone)
-     |> assign(:min_date, Helper.one_hundred_years_ago(time_zone))
-     |> assign(:max_date, Helper.one_hundred_years_after(time_zone))
-     |> assign(:ranges, range_definition(time_zone))
-     |> update_picker_mode_single()
-     |> update_picker_mode_range()}
+     |> set_data()
+     |> set_time_zone()
+     |> set_min_date()
+     |> set_max_date()
+     |> set_ranges()
+     |> update_picker()}
+  end
+
+  defp set_data(%{assigns: %{value: value, range_selected: range_selected}} = socket)
+       when value === nil && range_selected != nil,
+       do: socket |> assign(range_selected: nil) |> assign(show_calendar: false)
+
+  defp set_data(socket), do: socket
+
+  defp set_time_zone(%{assigns: %{tz_offset: tz_offset}} = socket),
+    do: socket |> assign(time_zone: tz_offset |> Helper.get_time_zone() |> ok_time_zone())
+
+  defp set_time_zone(socket), do: socket |> assign(time_zone: @tz_default)
+
+  defp ok_time_zone(time_zone) do
+    if Timex.is_valid_timezone?(time_zone), do: time_zone, else: @tz_default
+  end
+
+  defp set_min_date(%{assigns: %{time_zone: time_zone}} = socket),
+    do: socket |> assign(:min_date, Helper.one_hundred_years_ago(time_zone))
+
+  defp set_max_date(%{assigns: %{time_zone: time_zone}} = socket),
+    do: socket |> assign(:max_date, Helper.one_hundred_years_after(time_zone))
+
+  defp set_ranges(%{assigns: %{picker_mode: :range}} = socket),
+    do: socket |> ranges_definitions()
+
+  defp set_ranges(socket), do: socket
+
+  defp update_picker(
+         %{
+           assigns: %{
+             picker_mode: :single,
+             time_zone: time_zone,
+             current_month: current_month
+           }
+         } = socket
+       ) do
+    current_month = current_month |> Timezone.convert(time_zone)
+
+    socket
+    |> assign(:current_month, current_month)
+    |> assign(:week_rows, week_rows(current_month))
+  end
+
+  defp update_picker(
+         %{
+           assigns: %{
+             picker_mode: :single,
+             time_zone: time_zone,
+             left_month: left_month,
+             right_month: right_month
+           }
+         } = socket
+       ) do
+    right_month = right_month |> Timezone.convert(time_zone) |> Timex.beginning_of_month()
+
+    left_month = left_month |> Timezone.convert(time_zone) |> Timex.beginning_of_month()
+
+    socket |> set_values_to_picker_mode_range(left_month, right_month)
   end
 
   def handle_event("clear", _, socket) do
@@ -204,9 +261,11 @@ defmodule Phoenix.Components.DatePicker do
     end
   end
 
-  def handle_event("select_option", %{"key" => keySelected}, socket) do
-    socket = socket |> assign(:range_selected, String.to_atom(keySelected))
-    {:noreply, socket |> get_range_by_option_selected(keySelected)}
+  def handle_event("range_option_selected", %{"key" => key}, socket) do
+    {:noreply,
+     socket
+     |> assign(:range_selected, String.to_atom(key))
+     |> get_range_by_option_selected(key)}
   end
 
   # CLEAR VALUE
@@ -395,8 +454,20 @@ defmodule Phoenix.Components.DatePicker do
     socket |> assign(:show_calendar, false) |> get_range_value_of_definition(keySelected)
   end
 
-  # ----> HELPER FUNCTIONS <----
+  defp get_range_value_of_definition(socket, key) do
+    {_, values} =
+      socket.assigns.range_options |> Enum.find(fn {k, _} -> k === String.to_atom(key) end)
 
+    dates =
+      values.dates |> Enum.map(&(&1 |> Timex.format!("{0D}/{0M}/{YYYY}"))) |> Enum.join(" - ")
+
+    start_date = values.dates |> List.first()
+    end_date = values.dates |> List.last()
+    send_values(socket.assigns.field_name, start_date, end_date, dates)
+    socket
+  end
+
+  # ----> HELPER FUNCTIONS <----
   defp generate_id_calendar(parent_id, calendar, date) do
     date_format = date |> Timex.format!("%m/%d/%Y", :strftime)
 
@@ -440,31 +511,91 @@ defmodule Phoenix.Components.DatePicker do
     1..12 |> Enum.map(&Timex.shift(date, months: &1 - current_month)) |> Enum.chunk_every(3)
   end
 
-  def range_definition(time_zone) do
+  defp default_ranges() do
     [
-      today: %{dates: Helper.now(time_zone) |> range_in_days(), name: "Hoy"},
+      today: %{dates: Helper.now(time_zone) |> range_in_days(), label: "Hoy"},
       yesterday: %{
         dates: Helper.now(time_zone) |> Timex.shift(days: -1) |> range_in_days(),
-        name: "Ayer"
+        label: "Ayer"
       },
       last_7days: %{
         dates:
           Helper.now(time_zone) |> Timex.shift(days: -6) |> range_in_days(Helper.now(time_zone)),
-        name: "Últimos 7 días"
+        label: "Últimos 7 días"
       },
       last_30days: %{
         dates:
           Helper.now(time_zone) |> Timex.shift(days: -29) |> range_in_days(Helper.now(time_zone)),
-        name: "Últimos 30 días"
+        label: "Últimos 30 días"
       },
-      this_month: %{dates: Helper.now(time_zone) |> range_this_month(), name: "Mes actual"},
+      this_month: %{dates: Helper.now(time_zone) |> range_this_month(), label: "Mes actual"},
       last_month: %{
         dates: Helper.now(time_zone) |> Timex.shift(months: -1) |> range_in_month(),
-        name: "Mes pasado"
-      },
-      custom: %{dates: [], name: "Personalizado"}
+        label: "Mes pasado"
+      }
     ]
   end
+
+  def range_definition(
+        %{
+          assigns: %{
+            time_zone: time_zone,
+            options: %{ranges: [], custom_range?: false}
+          }
+        } = socket
+      ),
+      do: socket |> assigns(range_options: default_ranges())
+
+  def range_definition(
+        %{
+          assigns: %{
+            time_zone: time_zone,
+            options: %{ranges: []}
+          }
+        } = socket
+      ),
+      do: socket |> assigns(range_options: default_ranges() ++ custom_range())
+
+  def range_definition(
+        %{
+          assigns: %{
+            time_zone: time_zone,
+            options: %{ranges: ranges, custom_range?: custom_range}
+          }
+        } = socket
+      ),
+      do: socket |> assigns(range_options: build_ranges(ranges, custom_range))
+
+  defp custom_range(), do: [custom: %{dates: [], label: "Personalizado"}]
+
+  defp build_ranges(ranges, custom_range) when is_list(ranges) do
+    ranges
+    |> Enum.map(&Calendar.Range.new/1)
+    |> Enum.reject(&nil_range/1)
+    |> case do
+      [] ->
+        Logger.info("Definiendo rangos por defecto.")
+        default_ranges()
+
+      r ->
+        r |> add_custom_range(custom_range)
+    end
+  end
+
+  defp build_ranges(ranges, _custom_range) do
+    Logger.warn(
+      "La declaracion de rangos, no cumple con la especificacion definida para el componente.
+      #{inspect(ranges)}"
+    )
+
+    default_ranges()
+  end
+
+  defp nil_range(nil), do: true
+  defp nil_range(%Calendar.Range{}), do: false
+
+  defp add_custom_range(r, true), do: r ++ custom_range()
+  defp add_custom_range(r, _), do: r
 
   defp range_in_days(start_date, end_date) do
     [start_date |> Timex.beginning_of_day(), end_date |> Timex.end_of_day()]
@@ -554,48 +685,6 @@ defmodule Phoenix.Components.DatePicker do
     key === String.to_atom("custom")
   end
 
-  defp get_range_value_of_definition(socket, key) do
-    {_, values} = socket.assigns.ranges |> Enum.find(fn {k, _} -> k === String.to_atom(key) end)
-
-    dates =
-      values.dates |> Enum.map(&(&1 |> Timex.format!("{0D}/{0M}/{YYYY}"))) |> Enum.join(" - ")
-
-    start_date = values.dates |> List.first()
-    end_date = values.dates |> List.last()
-    send_values(socket.assigns.field_name, start_date, end_date, dates)
-    socket
-  end
-
-  defp get_time_zone(assigns) do
-    if Map.has_key?(assigns, :tz_offset),
-      do: assigns.tz_offset |> Helper.get_time_zone() |> ok_time_zone(),
-      else: @tz_default
-  end
-
-  defp ok_time_zone(time_zone) do
-    if Timex.is_valid_timezone?(time_zone), do: time_zone, else: @tz_default
-  end
-
-  def update_picker_mode_single(socket) do
-    current_month = socket.assigns.current_month |> Timezone.convert(socket.assigns.time_zone)
-
-    socket
-    |> assign(:current_month, current_month)
-    |> assign(:week_rows, week_rows(current_month))
-  end
-
-  def update_picker_mode_range(socket) do
-    time_zone = socket.assigns.time_zone
-
-    right_month =
-      socket.assigns.right_month |> Timezone.convert(time_zone) |> Timex.beginning_of_month()
-
-    left_month =
-      socket.assigns.left_month |> Timezone.convert(time_zone) |> Timex.beginning_of_month()
-
-    socket |> set_values_to_picker_mode_range(left_month, right_month)
-  end
-
   def reset_picker_mode_range(socket) do
     time_zone = socket.assigns.time_zone
     right_month = Helper.now(time_zone) |> Timex.beginning_of_month()
@@ -614,6 +703,23 @@ defmodule Phoenix.Components.DatePicker do
     |> assign(:right_month, right_month)
     |> assign(:week_rows_left, week_rows(left_month))
     |> assign(:week_rows_right, week_rows(right_month))
+  end
+end
+
+defmodule Calendar.Range do
+  require Logger
+  # key: "today", label: "Hoy", type: :day, amount: 0
+  defstruct [:key, :label, type: :day, amount: 0]
+
+  def new(%{key: k, label: l} = elem),
+    do: %__MODULE__{} |> Map.merge(elem)
+
+  def new(elem) do
+    Logger.warn(
+      "El rango: #{inspect(elem)}, no cumple con la especificacion definida para el componente."
+    )
+
+    nil
   end
 end
 

@@ -1,7 +1,7 @@
 <div id="<%= @id %>">
-  <%= if @label != nil do %>
+  <%= if @options.label != nil do %>
     <label class="block text-sm font-medium text-gray-500">
-      <%= @label %>
+      <%= @options.label %>
     </label>
   <% end %>
   <div class="mt-1"
@@ -24,7 +24,7 @@
         <div class="w-full">
           <div class="p-1 flex border border-gray-300 shadow-sm focus:ring-gray-300 focus:border-gray-300 bg-white rounded">
             <div @click="open" class="flex flex-auto flex-wrap">
-              <input readonly placeholder="<%= @placeholder %>"
+              <input readonly placeholder="<%= @options.placeholder %>"
                     value="<%= if @value != nil do @value end %>"
                     class="bg-transparent p-1 px-2 appearance-none outline-none h-full w-full text-base sm:text-sm text-gray-500">
             </div>
@@ -50,22 +50,22 @@
           </div>
         </div>
         <div class="w-full relative">
-          <div x-show.transition.origin.top="isOpen()" x-cloak class="absolute shadow top-100 bg-white w-auto <%= if @opens === :left do %> right-0 <% else %> left-0 <% end %> rounded z-auto"  @click.away="close">
+          <div x-show.transition.origin.top="isOpen()" x-cloak class="absolute shadow top-100 bg-white w-auto <%= if @options.opens === :left do %> right-0 <% else %> left-0 <% end %> rounded z-auto"  @click.away="close">
             <div class="flex">
               <!-- DEFAULT RANGES -->
               <div class="flex flex-col overflow-y-auto h-auto min-w-max">
                 <%= if @picker_mode === :range do %>
-                  <%= for {k,v} <- @ranges do %>
+                  <%= for {k,v} <- @range_options do %>
                     <div class="cursor-pointer w-full border-gray-100 border-b hover:text-white hover:border-primary-300
                                 <%= if k === @range_selected do %>
                                   text-white bg-primary-200 hover:bg-primary-200 border-primary-200 hover:border-primary-200
                                 <% else %>
                                   hover:bg-primary-300
                                 <% end %>""
-                      @click="setShow(<%= k |> is_custom_range?() %> )" phx-click="select_option" phx-value-key="<%= k %>" phx-target="<%= @myself %>">
+                      @click="setShow(<%= is_custom_range?(k) %> )" phx-click="range_option_selected" phx-value-key="<%= k %>" phx-target="<%= @myself %>">
                       <div class="flex w-full items-center px-2 py-1.5 border-transparent border-l-2 relative">
                         <div class="w-full items-center flex justify-between">
-                          <div class="mx-2 leading-5 text-base sm:text-sm"><%= v.name %></div>
+                          <div class="mx-2 leading-5 text-base sm:text-sm"><%= v.label %></div>
                         </div>
                       </div>
                     </div>
