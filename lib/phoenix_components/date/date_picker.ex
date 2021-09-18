@@ -44,7 +44,7 @@ defmodule Phoenix.Components.DatePicker do
      |> assign(min_date: nil)
      |> assign(max_date: nil)
      |> assign(picker_mode: :single)
-     |> assign(options: @options)
+     |> assign(@options)
      |> assign(day_names: day_names(@week_start_at))
      |> assign(left_month: Timex.now() |> Timex.shift(months: -1))}
   end
@@ -584,36 +584,19 @@ defmodule Phoenix.Components.DatePicker do
   end
 
   def ranges_definitions(
-        %{
-          assigns: %{
-            time_zone: time_zone,
-            options: %{ranges: [], custom_range?: false}
-          }
-        } = socket
+        %{assigns: %{time_zone: time_zone, ranges: [], custom_range?: false}} = socket
       ) do
     Logger.warn("range_options [default_ranges] -> Funtion match [] false")
     socket |> assign(range_options: default_ranges(time_zone))
   end
 
-  def ranges_definitions(
-        %{
-          assigns: %{
-            time_zone: time_zone,
-            options: %{ranges: []}
-          }
-        } = socket
-      ) do
+  def ranges_definitions(%{assigns: %{time_zone: time_zone, ranges: []}} = socket) do
     Logger.warn("range_options [default_ranges ++ custom_range] -> Funtion match [] true")
     socket |> assign(range_options: default_ranges(time_zone) ++ custom_range())
   end
 
   def ranges_definitions(
-        %{
-          assigns: %{
-            time_zone: time_zone,
-            options: %{ranges: ranges, custom_range?: custom_range}
-          }
-        } = socket
+        %{assigns: %{time_zone: time_zone, ranges: ranges, custom_range?: custom_range}} = socket
       ) do
     Logger.warn("range_options build_ranges -> Funtion match ranges")
     socket |> assign(range_options: build_ranges(ranges, time_zone, custom_range))
