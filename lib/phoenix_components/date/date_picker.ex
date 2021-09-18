@@ -58,8 +58,9 @@ defmodule Phoenix.Components.DatePicker do
      |> set_min_date()
      |> set_max_date()
      |> set_ranges()
-     |> update_picker_mode_single()
-     |> update_picker_mode_range()}
+     # |> update_picker_mode_single()
+     # |> update_picker_mode_range()
+     |> update_picker()}
   end
 
   defp set_data(%{assigns: %{value: value, range_selected: range_selected}} = socket)
