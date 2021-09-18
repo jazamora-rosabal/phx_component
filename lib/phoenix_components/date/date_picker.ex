@@ -128,8 +128,7 @@ defmodule Phoenix.Components.DatePicker do
      socket
      |> assign(@default_data)
      |> assign(left_month: Timex.now() |> Timex.shift(months: -1))
-     |> update_picker_mode_single()
-     |> update_picker_mode_range()}
+     |> update_picker()}
   end
 
   def handle_event("toogle_calendar_mode", %{"calendar" => "left"}, socket) do
@@ -544,7 +543,7 @@ defmodule Phoenix.Components.DatePicker do
           }
         } = socket
       ),
-      do: socket |> assigns(range_options: default_ranges(time_zone))
+      do: socket |> assign(range_options: default_ranges(time_zone))
 
   def ranges_definitions(
         %{
@@ -554,7 +553,7 @@ defmodule Phoenix.Components.DatePicker do
           }
         } = socket
       ),
-      do: socket |> assigns(range_options: default_ranges(time_zone) ++ custom_range())
+      do: socket |> assign(range_options: default_ranges(time_zone) ++ custom_range())
 
   def ranges_definitions(
         %{
@@ -564,11 +563,11 @@ defmodule Phoenix.Components.DatePicker do
           }
         } = socket
       ),
-      do: socket |> assigns(range_options: build_ranges(ranges, time_zone, custom_range))
+      do: socket |> assign(range_options: build_ranges(ranges, time_zone, custom_range))
 
   defp custom_range(), do: [custom: %{dates: [], label: "Personalizado"}]
 
-  defp build_ranges(ranges, time_zone, custom_range) when is_list(ranges) do
+  defp build_ranges(ranges, time_zone, _custom_range) when is_list(ranges) do
     ranges
     |> Enum.map(&Calendar.Range.new/1)
     |> Enum.reject(&nil_range/1)
