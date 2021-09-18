@@ -28,7 +28,7 @@
                     value="<%= if @value != nil do @value end %>"
                     class="bg-transparent p-1 px-2 appearance-none outline-none h-full w-full text-base sm:text-sm text-gray-500">
             </div>
-            <div class="<%= if @value == nil do %> hidden <% end %> w-8 py-1 px-1 flex items-center border-gray-200">
+            <div class="<%= if @value == nil do %>hidden <% end %>w-8 py-1 px-1 flex items-center border-gray-200">
               <button type="button" class="cursor-pointer w-6 h-6 outline-none focus:outline-none"
                 phx-click="clear" phx-target="<%= @myself %>"
               >

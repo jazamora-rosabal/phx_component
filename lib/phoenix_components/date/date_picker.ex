@@ -582,8 +582,10 @@ defmodule Phoenix.Components.DatePicker do
             options: %{ranges: [], custom_range?: false}
           }
         } = socket
-      ),
-      do: socket |> assign(range_options: default_ranges(time_zone))
+      ) do
+    Logger.warn("range_options [default_ranges] -> Funtion match [] false")
+    socket |> assign(range_options: default_ranges(time_zone))
+  end
 
   def ranges_definitions(
         %{
@@ -592,8 +594,10 @@ defmodule Phoenix.Components.DatePicker do
             options: %{ranges: []}
           }
         } = socket
-      ),
-      do: socket |> assign(range_options: default_ranges(time_zone) ++ custom_range())
+      ) do
+    Logger.warn("range_options [default_ranges ++ custom_range] -> Funtion match [] true")
+    socket |> assign(range_options: default_ranges(time_zone) ++ custom_range())
+  end
 
   def ranges_definitions(
         %{
@@ -602,10 +606,15 @@ defmodule Phoenix.Components.DatePicker do
             options: %{ranges: ranges, custom_range?: custom_range}
           }
         } = socket
-      ),
-      do: socket |> assign(range_options: build_ranges(ranges, time_zone, custom_range))
+      ) do
+    Logger.warn("range_options build_ranges -> Funtion match ranges")
+    socket |> assign(range_options: build_ranges(ranges, time_zone, custom_range))
+  end
 
-  def ranges_definitions(socket), do: socket |> assign(range_options: [])
+  def ranges_definitions(socket) do
+    Logger.warn("range_options [] -> Funtion not match")
+    socket |> assign(range_options: [])
+  end
 
   defp custom_range(), do: [custom: %{dates: [], label: "Personalizado"}]
 
