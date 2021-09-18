@@ -50,17 +50,21 @@ defmodule Phoenix.Components.DatePicker do
   end
 
   def update(assigns, socket) do
-    IO.inspect(socket.assigns, label: "SOCKET")
+    # IO.inspect(socket.assigns, label: "SOCKET")
     IO.inspect(assigns, label: "Assigns")
+
+    socket =
+      socket
+      |> assign(assigns)
+      |> set_data()
+      |> set_time_zone()
+      |> set_min_date()
+      |> set_max_date()
+
+    IO.inspect(socket.assigns, label: "SOCKET")
 
     {:ok,
      socket
-     |> assign(assigns)
-     |> set_data()
-     |> set_time_zone()
-     |> set_min_date()
-     |> set_max_date()
-     |> IO.inspect(limit: :infinity)
      |> set_ranges()
      # |> update_picker_mode_single()
      # |> update_picker_mode_range()
