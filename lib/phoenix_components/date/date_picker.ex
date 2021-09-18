@@ -92,48 +92,14 @@ defmodule Phoenix.Components.DatePicker do
 
   defp set_ranges(socket), do: socket
 
-  def update_picker_mode_single(
-        %{
-          assigns: %{
-            picker_mode: :single,
-            time_zone: time_zone,
-            current_month: current_month
-          }
-        } = socket
-      ) do
-    current_month = current_month |> Timezone.convert(time_zone)
-
-    socket
-    |> assign(:current_month, current_month)
-    |> assign(:week_rows, week_rows(current_month))
-  end
-
-  def update_picker_mode_range(
-        %{
-          assigns: %{
-            picker_mode: :single,
-            time_zone: time_zone,
-            left_month: left_month,
-            right_month: right_month
-          }
-        } = socket
-      ) do
-    right_month = right_month |> Timezone.convert(time_zone) |> Timex.beginning_of_month()
-
-    left_month = left_month |> Timezone.convert(time_zone) |> Timex.beginning_of_month()
-
-    socket |> set_values_to_picker_mode_range(left_month, right_month)
-  end
-
-  # defp update_picker(
-  #        %{
-  #          assigns: %{
-  #            picker_mode: :single,
-  #            time_zone: time_zone,
-  #            current_month: current_month
-  #          }
-  #        } = socket
-  #      ) do
+  # def update_picker_mode_single(
+  #       %{
+  #         assigns: %{
+  #           time_zone: time_zone,
+  #           current_month: current_month
+  #         }
+  #       } = socket
+  #     ) do
   #   current_month = current_month |> Timezone.convert(time_zone)
   #
   #   socket
@@ -141,24 +107,56 @@ defmodule Phoenix.Components.DatePicker do
   #   |> assign(:week_rows, week_rows(current_month))
   # end
   #
-  # defp update_picker(
-  #        %{
-  #          assigns: %{
-  #            picker_mode: :single,
-  #            time_zone: time_zone,
-  #            left_month: left_month,
-  #            right_month: right_month
-  #          }
-  #        } = socket
-  #      ) do
+  # def update_picker_mode_range(
+  #       %{
+  #         assigns: %{
+  #           time_zone: time_zone,
+  #           left_month: left_month,
+  #           right_month: right_month
+  #         }
+  #       } = socket
+  #     ) do
   #   right_month = right_month |> Timezone.convert(time_zone) |> Timex.beginning_of_month()
   #
   #   left_month = left_month |> Timezone.convert(time_zone) |> Timex.beginning_of_month()
   #
   #   socket |> set_values_to_picker_mode_range(left_month, right_month)
   # end
-  #
-  # defp update_picker(socket), do: socket
+
+  defp update_picker(
+         %{
+           assigns: %{
+             picker_mode: :single,
+             time_zone: time_zone,
+             current_month: current_month
+           }
+         } = socket
+       ) do
+    current_month = current_month |> Timezone.convert(time_zone)
+
+    socket
+    |> assign(:current_month, current_month)
+    |> assign(:week_rows, week_rows(current_month))
+  end
+
+  defp update_picker(
+         %{
+           assigns: %{
+             picker_mode: :range,
+             time_zone: time_zone,
+             left_month: left_month,
+             right_month: right_month
+           }
+         } = socket
+       ) do
+    right_month = right_month |> Timezone.convert(time_zone) |> Timex.beginning_of_month()
+
+    left_month = left_month |> Timezone.convert(time_zone) |> Timex.beginning_of_month()
+
+    socket |> set_values_to_picker_mode_range(left_month, right_month)
+  end
+
+  defp update_picker(socket), do: socket
 
   def handle_event("clear", _, socket) do
     send_values(socket.assigns.field_name)
@@ -167,8 +165,9 @@ defmodule Phoenix.Components.DatePicker do
      socket
      |> assign(@default_data)
      |> assign(left_month: Timex.now() |> Timex.shift(months: -1))
-     |> update_picker_mode_single()
-     |> update_picker_mode_range()}
+     # |> update_picker_mode_single()
+     # |> update_picker_mode_range()
+     |> update_picker()}
   end
 
   def handle_event("toogle_calendar_mode", %{"calendar" => "left"}, socket) do
