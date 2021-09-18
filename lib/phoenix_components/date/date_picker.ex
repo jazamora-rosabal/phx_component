@@ -536,7 +536,7 @@ defmodule Phoenix.Components.DatePicker do
     ]
   end
 
-  def range_definition(
+  def ranges_definitions(
         %{
           assigns: %{
             time_zone: time_zone,
@@ -546,7 +546,7 @@ defmodule Phoenix.Components.DatePicker do
       ),
       do: socket |> assigns(range_options: default_ranges(time_zone))
 
-  def range_definition(
+  def ranges_definitions(
         %{
           assigns: %{
             time_zone: time_zone,
@@ -556,7 +556,7 @@ defmodule Phoenix.Components.DatePicker do
       ),
       do: socket |> assigns(range_options: default_ranges(time_zone) ++ custom_range())
 
-  def range_definition(
+  def ranges_definitions(
         %{
           assigns: %{
             time_zone: time_zone,
