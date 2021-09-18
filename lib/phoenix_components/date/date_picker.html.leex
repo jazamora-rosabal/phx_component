@@ -1,7 +1,7 @@
 <div id="<%= @id %>">
-  <%= if @options.label != nil do %>
+  <%= if @label != nil do %>
     <label class="block text-sm font-medium text-gray-500">
-      <%= @options.label %>
+      <%= @label %>
     </label>
   <% end %>
   <div class="mt-1"
@@ -50,7 +50,7 @@
           </div>
         </div>
         <div class="w-full relative">
-          <div x-show.transition.origin.top="isOpen()" x-cloak class="absolute shadow top-100 bg-white w-auto <%= if @options.opens === :left do %> right-0 <% else %> left-0 <% end %> rounded z-auto"  @click.away="close">
+          <div x-show.transition.origin.top="isOpen()" x-cloak class="absolute shadow top-100 bg-white w-auto right-0 rounded z-auto"  @click.away="close">
             <div class="flex">
               <!-- DEFAULT RANGES -->
               <div class="flex flex-col overflow-y-auto h-auto min-w-max">

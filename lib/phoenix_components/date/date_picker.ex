@@ -30,9 +30,7 @@ defmodule Phoenix.Components.DatePicker do
   }
 
   @options %{
-    label: nil,
     placeholder: "Seleccione",
-    opens: :left,
     custom_range?: false,
     ranges: []
   }
@@ -41,7 +39,8 @@ defmodule Phoenix.Components.DatePicker do
     {:ok,
      socket
      |> assign(@default_data)
-     |> assign(:field_name, "field_date")
+     |> assign(label: nil)
+     |> assign(field_name: "field_date")
      |> assign(min_date: nil)
      |> assign(max_date: nil)
      |> assign(picker_mode: :single)
@@ -712,7 +711,7 @@ defmodule Calendar.Range do
   # key: "today", label: "Hoy", type: :day, amount: 0
   defstruct [:key, :label, type: :day, amount: 0]
 
-  def new(%{key: k, label: l} = elem),
+  def new(%{key: _k, label: _l} = elem),
     do: %__MODULE__{} |> Map.merge(elem)
 
   def new(elem) do
