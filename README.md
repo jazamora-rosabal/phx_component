@@ -32,12 +32,15 @@ En tu proceso LiveView colocas lo siguiente:
 
 * Eg. del `handle_info`:
   ```elixir
-    def handle_info({DatePicker, :picker_changed, %Response{target: target, value_str: value, :date, :range}}, socket)
+    def handle_info({DatePicker, :picker_changed, %Response{target: target, value_str: value, :date, :range}}, socket) do
+
+    {:noreply, socket}
+    end
   ```
 #### Estructura **Response**
 * `target` identifica el nombre del input que contiene la fecha o el rango de fecha
 * `value_str` valor del input que contiene la fecha o el rango seleccionado.
-* `date` Fecha seleccionada(`Datetime` ajustado al localtime del navegador), toma valor `nil` si estas en modo Rango.
+* `date` Fecha seleccionada(`NaiveDateTime` ajustado al localtime del navegador), toma valor `nil` si estas en modo Rango.
 * `range` Rango de fecha seleccionado(Estructura `Timex.Interval` ajustado al localtime del navegador), toma valor `nil` si estas en modo Simple.
 ##### Eg. **Response** para una fecha simple(tz_offset: -4)
 ```elixir
@@ -106,12 +109,12 @@ En tu proceso LiveView colocas lo siguiente:
 * `selection_hover_class` Solo es necesario cuando el DatePicker es de Rango. Se utiliza para cambiar la clase `hover` de los elementos que están dentro del rango que se selecciona y en las opciones de los rangos predeterminados.
 * `single_picker?` Especifica el tipo de DatePicker (`true` -> **Simple**, `false` -> **Rango**). Por defecto es `true`.
 * `custom_range?` Este valor es solo tomado en cuenta si `single_picker?` tiene valor `false`. En dependencia de su valor(`true` o `false`), se agrega al listado de rangos la opcion para seleccionar un rango personalizado. Por defecto tiene valor `false`
-* `ranges` Se espera que sea un listado de rangos que quisiera definir. De no especificar ningun valor, el componente toma los rangos por defectos para darle la opcion de que tenga rangos personalizados. A continuacion se especifican como definir los rangos personalizados.
+* `ranges` Se espera que sea un listado de rangos. De no especificar ningún valor, el componente toma los rangos por defectos para darle la opción de que tenga rangos personalizados. A continuación se detalla como definir los rangos personalizados.
 
 
-### Rangos
+### Rangos Personalizados
 #### Por defecto
-El componente tiene los siguientes Rangos definidos y que usted puede usar sin tener que especificarlo en la configuración del mismo.
+El componente tiene los siguientes Rangos predefinidos y que usted puede usar sin tener que especificarlo en la configuración del mismo.
 ```elixir
 today: "Hoy",
 yesterday: "Ayer",
@@ -133,14 +136,14 @@ Eg.
 ```
 * Puedes definir uno completamente nuevo, para ello defines un mapa con la siguiente estructura.
 `%{label: label, amount: amount, in: step}`
-se espera que `label` es una cadena, `amount` un entero, `in` un atom (`:days`, `:months`, `:years`)
+se espera que `label` es una cadena, `amount` un entero, `in` un atom (`:days`, `:months`, `:years`).
 Eg.
 ```elixir
 <%= live_component @socket, DatePicker,
     ..,
     ranges:
     [
-      :today, # Puedes convinar ambas configuraciones.
+      :today, # Puedes combinar ambas configuraciones.
       %{label: "Mes próximo", amount: 1, in: :months},
       %{label: "Ultimos 5 años", amount: -5, in: :years}
     ]
@@ -153,11 +156,11 @@ let liveSocket = new LiveSocket("/app/live", Socket, {
 	hooks: Hooks,
 	params: {
 		_csrf_token: csrfToken,
-		tz_offset: -(new Date().getTimezoneOffset()/60)
+		tz_offset: -(new Date().getTimezoneOffset()/60) //Calcular el timezone_offset y pasarlo como parámetro de conexión.
 	}})
 ```
 Luego en el proceso LiveView, en el mount puedes captar este dato usando la siguiente función
-connect_params = socket |> get_connect_params()
+`get_connect_params(socket)`
 ```elixir
 @impl true
   def mount(_params, session, socket) do
