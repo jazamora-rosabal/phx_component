@@ -15,20 +15,27 @@ end
 
 ## Phoenix.Components.DatePicker
 
-**El componente DatePicker está diseñado para poder seleccionar una fecha o un rango de fecha. Permite la navegacion del calendario por meses y por años. Tiene una navegación de 200 años, tomando como punto de partida la fecha actual(100 años <= hoy >= 100 años). Se utiliza Tailwind para el estilo del componente y Timex para las funciones de fecha. **
+El componente **DatePicker** está diseñado para poder seleccionar una fecha o un rango de fecha. Permite la navegación del calendario por meses y por años. Tiene una navegación de 200 años, tomando como punto de partida la fecha actual(100 años <= hoy >= 100 años). Se utiliza Tailwind para el estilo del componente y Timex para las funciones de fecha.
 
 Agregar lo siguiente en el modulo:
-
+### Dependencias
+```elixir
+defp deps do
+  [
+    {:timex, "~> 3.7.6"}
+  ]
+```
+### Configuracion
 * `alias Phoenix.Components.DatePicker`
-* `alias Phoenix.DatePicker.Response`
+* `alias Phoenix.Components.DatePicker.Response`
 
 * Eg. del `handle_info`:
   ```elixir
     def handle_info({DatePicker, :picker_changed, %Response{target: target, value_str: value, :date, :range}}, socket)
   ```
-* Estructura `Response`
+##### Estructura **Response**
 * `target` identifica el nombre del input que contiene la fecha o el rango de fecha
-* `value_str` valor visual de la fecha o el rango seleccionado.
+* `value_str` valor del input que contiene la fecha o el rango seleccionado.
 * `date` Fecha seleccionada(`Datetime` ajustado al localtime del navegador), toma valor `nil` si estas en modo Rango.
 * `range` Rango de fecha seleccionado(Estructura `Timex.Interval` ajustado al localtime del navegador), toma valor `nil` si estas en modo Simple.
 
@@ -96,7 +103,3 @@ Se puede hacer de dos manera.
 Eg. `%{label: "Ultimos 5 años", amount: -5, in: :years}`,
 Eg. `%{label: "Mañana", amount: 1, in: :days}`,
 se espera que `label` es una cadena, `amount` un entero, `in` un atom (`:days`, `:months`, `:years`)
-
-### Dependencias
-
-* timex ~> 3.7.6
