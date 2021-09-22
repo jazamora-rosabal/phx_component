@@ -42,7 +42,7 @@ En tu proceso LiveView colocas lo siguiente:
 ##### Eg. **Response** para una fecha simple(tz_offset: -4)
 ```elixir
  %Phoenix.Components.DatePicker.Response{
-  target: "inserted_ot",
+  target: "inserted_at",
   value_str: "19/08/2021",
   date: ~N[2021-08-19 04:00:00],
   range: nil
@@ -111,7 +111,7 @@ En tu proceso LiveView colocas lo siguiente:
 
 ### Rangos
 #### Por defecto
-El componente tiene los siguientes Rangos definidos y que usted puede usar sin tener que especificarlo en la configuracion del mismo.
+El componente tiene los siguientes Rangos definidos y que usted puede usar sin tener que especificarlo en la configuración del mismo.
 ```elixir
 today: "Hoy",
 yesterday: "Ayer",
@@ -127,15 +127,17 @@ Se puede hacer de dos manera.
 Eg.
 ```elixir
 <%= live_component @socket, DatePicker,
+    ..,
     ranges: [:today, :yesterday]
  %>
 ```
 * Puedes definir uno completamente nuevo, para ello defines un mapa con la siguiente estructura.
-`%{label: label, amount: amount, in: :step}`
+`%{label: label, amount: amount, in: step}`
 se espera que `label` es una cadena, `amount` un entero, `in` un atom (`:days`, `:months`, `:years`)
 Eg.
 ```elixir
 <%= live_component @socket, DatePicker,
+    ..,
     ranges:
     [
       :today, # Puedes convinar ambas configuraciones.
@@ -143,4 +145,27 @@ Eg.
       %{label: "Ultimos 5 años", amount: -5, in: :years}
     ]
  %>
+```
+### Como determinar el tz_offset
+En el archivo ``app.js`` cuando se define el **LiveSocket**
+```js
+let liveSocket = new LiveSocket("/app/live", Socket, {
+	hooks: Hooks,
+	params: {
+		_csrf_token: csrfToken,
+		tz_offset: -(new Date().getTimezoneOffset()/60)
+	}})
+```
+Luego en el proceso LiveView, en el mount puedes captar este dato usando la siguiente función
+connect_params = socket |> get_connect_params()
+```elixir
+@impl true
+  def mount(_params, session, socket) do
+  connect_params = socket |> get_connect_params() # Funcion de Phoenix que devuelve los parametros de conexion.
+   tz_offset = connect_params |> get_time_zone_offset() # Extraemos el tz_offset que definimos app.js
+  {:ok, socket |> assign(tz_offset: tz_offset})
+  end
+
+  defp get_time_zone_offset(%{tz_offset: tz_offset}), do: tz_offset # Buscar por la misma key que se definio en app.js
+  defp get_time_zone_offset(_), do: 0
 ```
