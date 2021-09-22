@@ -1,5 +1,5 @@
 <div id="<%= @id %>">
-  <%= if @label != nil do %>
+  <%= if @label != nil &&  String.trim(@label) != "" do %>
     <label class="block text-sm font-medium text-gray-500">
       <%= @label %>
     </label>
@@ -25,6 +25,7 @@
           <div class="p-1 flex border border-gray-300 shadow-sm focus:ring-gray-300 focus:border-gray-300 bg-white rounded">
             <div @click="open" class="flex flex-auto flex-wrap">
               <input readonly placeholder="<%= @placeholder %>"
+                    name= "<%= @field_name %>"
                     value="<%= if @value != nil do @value end %>"
                     class="bg-transparent p-1 px-2 appearance-none outline-none h-full w-full text-base sm:text-sm text-gray-500">
             </div>
@@ -54,18 +55,15 @@
             <div class="flex">
               <!-- DEFAULT RANGES -->
               <div class="flex flex-col overflow-y-auto h-auto min-w-max">
-                <%= if @picker_mode === :range do %>
-                  <%= for {k,v} <- @range_options do %>
-                    <div class="cursor-pointer w-full border-gray-100 border-b hover:text-white hover:border-primary-300
-                                <%= if k === @range_selected do %>
-                                  text-white bg-primary-200 hover:bg-primary-200 border-primary-200 hover:border-primary-200
-                                <% else %>
-                                  hover:bg-primary-300
-                                <% end %>""
-                      @click="setShow(<%= is_custom_range?(k) %> )" phx-click="range_option_selected" phx-value-key="<%= k %>" phx-target="<%= @myself %>">
+                <%= if !@single_picker? do %>
+                  <%= for range <- @range_options do %>
+                    <div
+                    class="<%= get_range_class(@range_selected, range, @selection_class, @selection_hover_class) %> cursor-pointer w-full border-gray-100 border-b hover:text-white hover:border-<%= @selection_hover_class %>"
+
+                      @click="setShow(<%= is_custom_range?(range) %>)" phx-click="range_option_selected" phx-value-key="<%= range.key %>" phx-target="<%= @myself %>">
                       <div class="flex w-full items-center px-2 py-1.5 border-transparent border-l-2 relative">
                         <div class="w-full items-center flex justify-between">
-                          <div class="mx-2 leading-5 text-base sm:text-sm"><%= v.label %></div>
+                          <div class="mx-2 leading-5 text-base sm:text-sm"><%= range.label %></div>
                         </div>
                       </div>
                     </div>
@@ -73,7 +71,7 @@
                 <% end %>
               </div>
               <!-- CALENDARS-->
-              <%= if @picker_mode === :range do %>
+              <%= if !@single_picker? do %>
                 <div class="flex border-l border-gray-200 min-w-max h-full <%= if !@show_calendar do %> hidden <% end %>">
                   <div id="calendar_left" class="flex flex-col space-y-1 w-66 min-h-full ml-2 mr-1 my-1">
                     <header class="flex items-center">
@@ -116,18 +114,20 @@
                       <%= for week <- @week_rows_left do %>
                         <div class="flex w-full items-center">
                           <%= for day <- week do %>
-                              <%= live_component @socket, Phoenix.Components.CalendarDay,
+                              <%= live_component @socket, CalendarDay,
                               id: generate_id_calendar(@id, "left", day),
                               parent_id: @id,
                               day: day,
                               current_month: @left_month,
                               start_date: @start_date,
                               end_date: @end_date,
-                              interval: @interval,
+                              range: @range_selected,
                               min_date: @min_date,
                               max_date: @right_month,
-                              mode: @picker_mode,
-                              time_zone: @time_zone
+                              mode: @single_picker?,
+                              time_zone: @time_zone,
+                              selection_class: @selection_class,
+                              selection_hover_class: @selection_hover_class
                               %>
                           <% end %>
                         </div>
@@ -138,7 +138,7 @@
                       <%= for rows <- get_month_or_years(@calendar_left_mode, @left_month ) do %>
                         <div class="flex w-full items-center">
                           <%= for date <- rows do %>
-                              <%= live_component @socket, Phoenix.Components.CalendarMonthYear,
+                              <%= live_component @socket, CalendarMonthYear,
                                   id: "#{@id}_left_column-#{date}",
                                   parent_id: @id,
                                   date: date,
@@ -148,7 +148,7 @@
                                   time_zone: @time_zone,
                                   calendar: "left",
                                   calendar_mode: @calendar_left_mode,
-                                  picker_mode: @picker_mode
+                                  mode: @single_picker?
                                   %>
                           <% end %>
                         </div>
@@ -197,18 +197,20 @@
                       <%= for week <- @week_rows_right do %>
                         <div class="flex w-full items-center">
                           <%= for day <- week do %>
-                            <%= live_component @socket, Phoenix.Components.CalendarDay,
+                            <%= live_component @socket, CalendarDay,
                               id: generate_id_calendar(@id, "right", day),
                               parent_id: @id,
                               day: day,
                               current_month: @right_month,
                               start_date: @start_date,
                               end_date: @end_date,
-                              interval: @interval,
+                              range: @range_selected,
                               min_date: @left_month,
                               max_date: @max_date,
-                              mode: @picker_mode,
-                              time_zone: @time_zone
+                              mode: @single_picker?,
+                              time_zone: @time_zone,
+                              selection_class: @selection_class,
+                              selection_hover_class: @selection_hover_class
                             %>
                           <% end %>
                         </div>
@@ -219,7 +221,7 @@
                       <%= for rows <- get_month_or_years(@calendar_right_mode, @right_month ) do %>
                         <div class="flex w-full items-center">
                           <%= for date <- rows do %>
-                              <%= live_component @socket, Phoenix.Components.CalendarMonthYear,
+                              <%= live_component @socket, CalendarMonthYear,
                                   id: "#{@id}_right_column-#{date}",
                                   parent_id: @id,
                                   date: date,
@@ -229,7 +231,7 @@
                                   time_zone: @time_zone,
                                   calendar: "right",
                                   calendar_mode: @calendar_right_mode,
-                                  picker_mode: @picker_mode
+                                  mode: @single_picker?
                                   %>
                           <% end %>
                         </div>
@@ -279,7 +281,7 @@
                     <%= for week <- @week_rows do %>
                       <div class="flex w-full items-center">
                         <%= for day <- week do %>
-                          <%= live_component @socket, Phoenix.Components.CalendarDay,
+                          <%= live_component @socket, CalendarDay,
                             id: "#{@id}_current_month-#{day}",
                             parent_id: @id,
                             day: day,
@@ -287,8 +289,10 @@
                             date: @current_date,
                             min_date: @min_date,
                             max_date: @max_date,
-                            mode: @picker_mode,
-                            time_zone: @time_zone
+                            mode: @single_picker?,
+                            time_zone: @time_zone,
+                            selection_class: @selection_class,
+                            selection_hover_class: @selection_hover_class
                           %>
                         <% end %>
                       </div>
@@ -300,7 +304,7 @@
                     <%= for rows <- get_month_or_years(@calendar_mode, @current_month ) do %>
                       <div class="flex w-full items-center">
                         <%= for date <- rows do %>
-                          <%= live_component @socket, Phoenix.Components.CalendarMonthYear,
+                          <%= live_component @socket, CalendarMonthYear,
                             id: "#{@id}_current_column-#{date}",
                             parent_id: @id,
                             date: date,
@@ -310,7 +314,7 @@
                             time_zone: @time_zone,
                             calendar: "current",
                             calendar_mode: @calendar_mode,
-                            picker_mode: @picker_mode
+                            mode: @single_picker?
                           %>
                         <% end %>
                       </div>

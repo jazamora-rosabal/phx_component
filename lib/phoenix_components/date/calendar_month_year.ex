@@ -1,8 +1,7 @@
 defmodule Phoenix.Components.CalendarMonthYear do
   use Phoenix.LiveComponent
   use Timex
-
-  alias Calendar.Helper
+  alias Phoenix.Components.DatePicker.Helpers.Calendar
 
   def update(assigns, socket) do
     {
@@ -36,26 +35,26 @@ defmodule Phoenix.Components.CalendarMonthYear do
   defp after_max_date?(%{max_date: max_date}) when max_date == nil, do: false
 
   defp after_max_date?(%{
-         picker_mode: picker_mode,
+          mode: mode,
          calendar_mode: calendar_mode,
          calendar: calendar,
          date: date,
          max_date: max_date
        }),
-       do: Helper.after_max_date?(picker_mode, calendar_mode, calendar, date, max_date)
+       do: Calendar.after_max_date?(mode, calendar_mode, calendar, date, max_date)
 
   defp after_max_date?(_), do: false
 
   defp before_min_date?(%{min_date: min_date}) when min_date == nil, do: false
 
   defp before_min_date?(%{
-         picker_mode: picker_mode,
+         mode: mode,
          calendar_mode: calendar_mode,
          calendar: calendar,
          date: date,
          min_date: min_date
        }),
-       do: Helper.before_min_date?(picker_mode, calendar_mode, calendar, date, min_date)
+       do: Calendar.before_min_date?(mode, calendar_mode, calendar, date, min_date)
 
   defp before_min_date?(_), do: false
 
@@ -64,20 +63,15 @@ defmodule Phoenix.Components.CalendarMonthYear do
   end
 
   defp get_value(date, :month),
-    do: date |> Timex.format!("%b", :strftime) |> Timex.month_to_num() |> Helper.short_month()
+    do: date |> Timex.format!("%b", :strftime) |> Timex.month_to_num() |> Calendar.short_month()
 
   defp get_value(date, _),
     do: Timex.format!(date, "%Y", :strftime)
 
-  defp is_block?(assigns) do
-    before_min_date?(assigns) || after_max_date?(assigns)
-  end
+  defp is_block?(assigns),
+    do: before_min_date?(assigns) || after_max_date?(assigns)
 
-  defp x_padding(clazz, :month) do
-    "#{clazz} px-8"
-  end
+  defp x_padding(clazz, :month), do: "#{clazz} px-8"
 
-  defp x_padding(clazz, _) do
-    "#{clazz} px-7"
-  end
+  defp x_padding(clazz, _), do: "#{clazz} px-7"
 end

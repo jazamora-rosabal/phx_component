@@ -3,14 +3,15 @@
   phx-click="pick-date"
   phx-value-date="<%= @day |> get_date() %>"
   phx-value-block="<%= is_block?(@socket.assigns) %>"
-  phx-value-mode="<%= @mode %>"
-  x-data="{ startDate: <%= if @mode === :range && @start_date != nil do %> '<%= @start_date |> get_date_to_js() %>' <% else %> null <% end %>,
-            endDate: <%= if @mode === :range && @end_date != nil do %> '<%= @end_date |> get_date_to_js() %>' <% else %> null <% end %>,
-            mode: '<%= @mode |> Atom.to_string() %>',
+  x-data="{ startDate: <%= if @mode == false && @start_date != nil do %> '<%= @start_date |> get_date_to_js() %>' <% else %> null <% end %>,
+            endDate: <%= if @mode == false && @end_date != nil do %> '<%= @end_date |> get_date_to_js() %>' <% else %> null <% end %>,
+            mode: '<%= @mode %>',
             day: '<%= @day |> get_date_to_js() %>',
             parentId: '<%= @parent_id %>',
+            selected_class: 'bg-<%= @selection_class %>',
+            hover_class: 'bg-<%= @selection_hover_class %>',
             showHoverClass() {
-              if(this.mode === 'range' && this.endDate === null && this.startDate != null){
+              if(this.mode == 'false' && this.endDate == null && this.startDate != null){
                   let calendar = document.getElementById(this.parentId);
                   if(calendar != null){
                     available_days = calendar.getElementsByClassName('available-day');
@@ -19,13 +20,13 @@
                       dayId = available_days[i].id.split('month-')[1];
                       if(this.isAfterStartDate(dayId) && this.isBeforeThatDate(dayId, this.day)){
                         if(this.isEqualsStartDate(dayId)){
-                          element.classList.add('bg-primary-200', 'text-white');
+                          element.classList.add(this.selected_class, 'text-white');
                         }else{
-                          element.classList.add('bg-primary-300', 'text-white');
+                          element.classList.add(this.hover_class, 'text-white');
                           element.classList.remove('hover:bg-gray-200');
                         }
                       }else{
-                        element.classList.remove('bg-primary-200','bg-primary-300', 'text-white');
+                        element.classList.remove(this.selected_class, this.hover_class, 'text-white');
                       }
                     }
                   }
@@ -38,7 +39,6 @@
             isBeforeThatDate(day, hoverDate) { return this.getValueOfDate(day) <= this.getValueOfDate(hoverDate) }
           }"
   @mouseover="showHoverClass()"
-  class="text-xs text-center border p-2 w-full <%= @day_class %>"
->
+  class="text-xs text-center border p-2 w-full <%= @day_class %>">
   <%= Timex.format!(@day, "%e", :strftime) %>
 </div>

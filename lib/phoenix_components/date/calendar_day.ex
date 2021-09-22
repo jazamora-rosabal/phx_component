@@ -1,19 +1,18 @@
 defmodule Phoenix.Components.CalendarDay do
   use Phoenix.LiveComponent
   use Timex
-
-  alias Calendar.Helper
+  alias Phoenix.Components.DatePicker.Helpers.{Range, Calendar}
 
   def update(assigns, socket) do
-    {
-      :ok,
+    {:ok,
       socket
       |> assign(assigns)
       |> assign(:day_class, day_class(assigns))
     }
   end
 
-  defp day_class(assigns) do
+
+  defp day_class(%{selection_class: class, selection_hover_class: hover_class} = assigns) do
     cond do
       other_month?(assigns) ->
         "border-transparent text-gray-300 cursor-not-allowed"
@@ -22,10 +21,10 @@ defmodule Phoenix.Components.CalendarDay do
         "border-transparent text-gray-300 cursor-not-allowed line-through"
 
       selected_day?(assigns) ->
-        "border-transparent text-white bg-primary-200 cursor-pointer available-day"
+        "border-transparent text-white bg-#{class} cursor-pointer available-day"
 
       on_interval?(assigns) ->
-        "border-transparent text-white bg-primary-300 cursor-pointer available-day"
+        "border-transparent text-white bg-#{hover_class} cursor-pointer available-day"
 
       today?(assigns) ->
         "border-dashed border-gray-600 hover:bg-gray-200 cursor-pointer available-day"
@@ -48,50 +47,35 @@ defmodule Phoenix.Components.CalendarDay do
 
   defp after_max_date?(_), do: false
 
-  defp selected_day?(%{mode: :range, day: day, start_date: start_date, end_date: end_date}) do
-    (start_date !== nil && same_date?(day, start_date)) ||
-      (end_date !== nil && same_date?(day, end_date))
+  defp selected_day?(%{mode: false, day: day, start_date: start_date, end_date: end_date}) do
+    (start_date !== nil && Calendar.same_date?(day, start_date)) ||
+      (end_date !== nil && Calendar.same_date?(day, end_date))
   end
 
   defp selected_day?(%{day: day, date: date}) when date != nil do
-    same_date?(day, date)
+    Calendar.same_date?(day, date)
   end
 
   defp selected_day?(_), do: false
 
-  defp on_interval?(%{mode: :range, day: day, interval: interval} = assigns)
+  defp on_interval?(%{mode: false, day: day, range: %Range{interval: interval}} = assigns)
        when interval != nil do
     assigns
     |> other_month?()
     |> check_interval?(day, interval)
   end
 
-  defp on_interval?(_),
-    do: false
+  defp on_interval?(_), do: false
 
-  defp check_interval?(true, _, _),
-    do: false
+  defp check_interval?(true, _, _), do: false
 
-  defp check_interval?(false, day, interval),
-    do: day in interval
+  defp check_interval?(false, day, interval), do: day in interval
 
-  defp today?(assigns) do
-    assigns.day |> Helper.today?(assigns.time_zone)
-  end
+  defp today?(assigns), do: assigns.day |> Calendar.today?(assigns.time_zone)
 
-  defp get_date(date) do
-    Timex.format!(date, "%FT%T", :strftime)
-  end
+  defp get_date(date), do: Timex.format!(date, "%FT%T", :strftime)
 
-  defp get_date_to_js(date) do
-    Timex.format!(date, "%m/%d/%Y", :strftime)
-  end
+  defp get_date_to_js(date), do: Timex.format!(date, "%m/%d/%Y", :strftime)
 
-  def is_block?(assigns) do
-    after_max_date?(assigns) || other_month?(assigns)
-  end
-
-  defp same_date?(date0, date1) do
-    Map.take(date0, [:year, :month, :day]) == Map.take(date1, [:year, :month, :day])
-  end
+  def is_block?(assigns), do: after_max_date?(assigns) || other_month?(assigns)
 end
