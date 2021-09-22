@@ -2,7 +2,7 @@ defmodule Phoenix.Components.DatePicker.Helpers do
   defmodule Range do
     require Logger
     use Timex
-    alias DemoWeb.Components.DatePicker.Helpers.Calendar
+    alias Phoenix.Components.DatePicker.Helpers.Calendar
 
     @tz_default Timezone.name_of(0)
 
