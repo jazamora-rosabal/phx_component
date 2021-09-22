@@ -315,11 +315,11 @@ defmodule Phoenix.Components.DatePicker.Helpers do
   end
 end
 
-defmodule Phoenix.Components.DatePicker do
-  defmodule Response do
-    defstruct [:target, :value_str, :date, :range]
-  end
+defmodule Phoenix.Components.DatePicker.Response do
+  defstruct [:target, :value_str, :date, :range]
+end
 
+defmodule Phoenix.Components.DatePicker do
   @moduledoc """
   Documentation for DatePicker.
   """
@@ -330,6 +330,7 @@ defmodule Phoenix.Components.DatePicker do
 
   alias Timex.Timezone
   alias Phoenix.Components.DatePicker.Helpers.{Range, Calendar}
+  alias Phoenix.Components.DatePicker.Response
   alias Phoenix.Components.{CalendarDay, CalendarMonthYear}
 
 
